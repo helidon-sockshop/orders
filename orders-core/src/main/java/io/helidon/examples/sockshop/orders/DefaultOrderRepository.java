@@ -6,12 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
 
 /**
  */
 @ApplicationScoped
-@Alternative
 public class DefaultOrderRepository implements OrderRepository {
     private Map<String, Order> orders = new ConcurrentHashMap<>();
 
