@@ -16,7 +16,7 @@ public class DefaultOrderRepository implements OrderRepository {
     private Map<String, Order> orders = new ConcurrentHashMap<>();
 
     @Override
-    public Collection<Order> findOrdersByCustomer(String customerId) {
+    public Collection<? extends Order> findOrdersByCustomer(String customerId) {
         return orders.values().stream()
                 .filter(order -> order.getCustomerId().equals(customerId))
                 .collect(Collectors.toList());

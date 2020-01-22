@@ -51,7 +51,7 @@ public class OrderResource {
     @Path("search/customerId")
     @Produces(APPLICATION_JSON)
     public Response getOrdersForCustomer(@QueryParam("custId") String customerId) {
-        Collection<Order> customerOrders = orders.findOrdersByCustomer(customerId);
+        Collection<? extends Order> customerOrders = orders.findOrdersByCustomer(customerId);
         if (customerOrders.isEmpty()) {
             return Response.status(NOT_FOUND).build();
         }
