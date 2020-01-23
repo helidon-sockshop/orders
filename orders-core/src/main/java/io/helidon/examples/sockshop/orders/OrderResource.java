@@ -111,11 +111,6 @@ public class OrderResource {
         Shipment shipment = httpPost(shippingUri, Entity.json(new Shipment(orderId)), Shipment.class);
         LOGGER.log(Level.INFO, "Created Shipment: " + shipment);
 
-        Link link = Link.fromMethod(OrderResource.class, "getOrder")
-                .baseUri("http://orders/orders/")
-                .rel("self")
-                .build(orderId);
-
         Order order = new Order(
                 orderId,
                 customerId,
@@ -126,8 +121,6 @@ public class OrderResource {
                 shipment,
                 Calendar.getInstance().getTime(),
                 amount);
-
-        order.addLink("self", link);
 
         orders.saveOrder(order);
 

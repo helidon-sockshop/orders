@@ -4,22 +4,22 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Shipment implements Serializable {
-    private String id;
+    private String orderId;
     private String trackingNumber;
 
     public Shipment() {
     }
 
-    public Shipment(String id) {
-        this.id = id;
+    public Shipment(String orderId) {
+        this.orderId = orderId;
     }
 
-    public String getId() {
-        return id;
+    public String getOrderId() {
+        return orderId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public String getTrackingNumber() {
@@ -39,19 +39,19 @@ public class Shipment implements Serializable {
             return false;
         }
         Shipment shipment = (Shipment) o;
-        return id.equals(shipment.id) &&
+        return orderId.equals(shipment.orderId) &&
                 trackingNumber.equals(shipment.trackingNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, trackingNumber);
+        return Objects.hash(orderId, trackingNumber);
     }
 
     @Override
     public String toString() {
         return "Shipment{" +
-                "id='" + id + '\'' +
+                "id='" + orderId + '\'' +
                 ", trackingNumber='" + trackingNumber + '\'' +
                 '}';
     }

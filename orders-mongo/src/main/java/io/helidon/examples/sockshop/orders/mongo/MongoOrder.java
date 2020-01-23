@@ -3,6 +3,8 @@ package io.helidon.examples.sockshop.orders.mongo;
 import java.util.Collection;
 import java.util.Date;
 
+import javax.json.bind.annotation.JsonbTransient;
+
 import io.helidon.examples.sockshop.orders.Address;
 import io.helidon.examples.sockshop.orders.Card;
 import io.helidon.examples.sockshop.orders.Customer;
@@ -17,7 +19,7 @@ import org.bson.types.ObjectId;
  * @author Aleksandar Seovic  2020.01.16
  */
 public class MongoOrder extends Order {
-    @BsonId
+    @JsonbTransient
     public ObjectId _id;
 
     public MongoOrder() {

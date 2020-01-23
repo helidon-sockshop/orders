@@ -32,8 +32,6 @@ public class Order implements Serializable, Comparable<Order> {
 
     private float total;
 
-    private Map<String, Map<String, String>> links = new LinkedHashMap<>();
-
     public Order() {
     }
 
@@ -48,10 +46,6 @@ public class Order implements Serializable, Comparable<Order> {
         this.shipment = shipment;
         this.date = date;
         this.total = total;
-    }
-
-    public void addLink(String name, Link link) {
-        this.links.put(name, Collections.singletonMap("href", link.getUri().toString()));
     }
 
     @Override
@@ -151,11 +145,7 @@ public class Order implements Serializable, Comparable<Order> {
     }
 
     @JsonbProperty("_links")
-    public Map<String, Map<String, String>> getLinks() {
-        return links;
-    }
-
-    public void setLinks(Map<String, Map<String, String>> links) {
-        this.links = links;
+    public Links getLinks() {
+        return Links.order(id);
     }
 }

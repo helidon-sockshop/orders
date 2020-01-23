@@ -6,8 +6,6 @@ import java.util.List;
 
 public class Customer implements Serializable {
 
-    private String id;
-
     private String firstName;
     private String lastName;
     private String username;
@@ -19,9 +17,8 @@ public class Customer implements Serializable {
     public Customer() {
     }
 
-    public Customer(String id, String firstName, String lastName, String username, List<Address> addresses,
+    public Customer(String firstName, String lastName, String username, List<Address> addresses,
                     List<Card> cards) {
-        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -29,15 +26,10 @@ public class Customer implements Serializable {
         this.cards = cards;
     }
 
-    public Customer(String firstName, String lastName, String username, List<Address> addresses, List<Card> cards) {
-        this(null, firstName, lastName, username, addresses, cards);
-    }
-
     @Override
     public String toString() {
         return "Customer{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
+                "firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
                 ", addresses=" + addresses +
@@ -65,11 +57,7 @@ public class Customer implements Serializable {
     }
 
     public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+        return username;
     }
 
     public String getFirstName() {
