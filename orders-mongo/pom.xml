@@ -22,7 +22,15 @@
         <jib.goal>dockerBuild</jib.goal>
 
         <!-- dependencies -->
-        <lib.mongodb.version>3.12.0</lib.mongodb.version>
+        <version.lib.lombok>1.18.10</version.lib.lombok>
+        <version.lib.mongo>3.12.0</version.lib.mongo>
+        <version.lib.junit>5.5.0</version.lib.junit>
+        <version.lib.hamcrest>1.3</version.lib.hamcrest>
+        <version.lib.rest-assured>4.2.0</version.lib.rest-assured>
+
+        <version.plugin.surefire>2.22.1</version.plugin.surefire>
+        <version.plugin.failsafe>2.22.1</version.plugin.failsafe>
+        <version.plugin.surefire.provider.junit>1.3.2</version.plugin.surefire.provider.junit>
     </properties>
 
     <dependencies>
@@ -30,7 +38,15 @@
         <dependency>
             <groupId>io.helidon.examples.sockshop</groupId>
             <artifactId>orders-core</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.helidon.examples.sockshop</groupId>
+            <artifactId>orders-core</artifactId>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Helidon dependencies-->
@@ -44,11 +60,45 @@
         </dependency>
 
         <!-- Mongo dependencies -->
-       <dependency>
-           <groupId>org.mongodb</groupId>
-           <artifactId>mongodb-driver-sync</artifactId>
-           <version>${lib.mongodb.version}</version>
-       </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>${version.lib.mongo}</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${version.lib.lombok}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- test dependencies-->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${version.lib.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${version.lib.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>${version.lib.hamcrest}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${version.lib.rest-assured}</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
@@ -60,6 +110,61 @@
                 <executions>
                     <execution>
                         <id>make-index</id>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.20.1</version>
+                <executions>
+                    <execution>
+                        <id>prepare-it-database</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <images>
+                                <image>
+                                    <name>mongo:4.2.2</name>
+                                    <alias>orders-db</alias>
+                                    <run>
+                                        <ports>
+                                            <port>db.port:27017</port>
+                                        </ports>
+                                        <wait>
+                                            <log>(?s)waiting for connections on port 27017
+                                            </log>
+                                            <time>10000</time>
+                                        </wait>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>remove-it-database</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <db.host>localhost</db.host>
+                        <db.port>${db.port}</db.port>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

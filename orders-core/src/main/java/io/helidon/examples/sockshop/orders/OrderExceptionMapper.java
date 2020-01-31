@@ -10,6 +10,9 @@ import javax.ws.rs.ext.Provider;
 
 import static javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE;
 
+/**
+ * Exception mapper for {@code OrderException}s.
+ */
 @ApplicationScoped
 @Provider
 public class OrderExceptionMapper

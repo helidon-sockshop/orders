@@ -1,151 +1,113 @@
 package io.helidon.examples.sockshop.orders;
 
 import java.io.Serializable;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.json.bind.annotation.JsonbProperty;
-import javax.ws.rs.core.Link;
+import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Order information.
+ */
+@Data
+@NoArgsConstructor
+@Entity
 public class Order implements Serializable, Comparable<Order> {
+    /**
+     * Order identifier.
+     */
+    @Id
+    @JsonbProperty("id")
+    private String orderId;
 
-    private String id;
-
-    private String customerId;
-
+    /**
+     * Customer information.
+     */
+    @Embedded
     private Customer customer;
 
+    /**
+     * Billing/shipping address.
+     */
+    @Embedded
     private Address address;
 
+    /**
+     * Payment card details.
+     */
+    @Embedded
     private Card card;
 
-    private Collection<Item> items;
+    /**
+     * Order date and time.
+     */
+    private LocalDateTime date;
 
-    private Shipment shipment;
-
-    private Date date = Calendar.getInstance().getTime();
-
+    /**
+     * Order total.
+     */
     private float total;
 
-    public Order() {
-    }
+    /**
+     * Order items.
+     */
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Collection<Item> items;
 
-    public Order(String id, String customerId, Customer customer, Address address, Card card,
-                 Collection<Item> items, Shipment shipment, Date date, float total) {
-        this.id = id;
-        this.customerId = customerId;
+    /**
+     * Payment authorization.
+     */
+    @Embedded
+    private Payment payment;
+
+    /**
+     * Shipment details.
+     */
+    @Embedded
+    private Shipment shipment;
+
+    @Builder
+    public Order(String orderId,
+                 Customer customer,
+                 Address address,
+                 Card card,
+                 LocalDateTime date,
+                 float total,
+                 Collection<Item> items,
+                 Payment payment,
+                 Shipment shipment) {
+        this.orderId = orderId;
         this.customer = customer;
         this.address = address;
         this.card = card;
-        this.items = items;
-        this.shipment = shipment;
         this.date = date;
         this.total = total;
+        this.items = items;
+        this.payment = payment;
+        this.shipment = shipment;
+    }
+
+    /**
+     * Order links.
+     *
+     * @return order links
+     */
+    @JsonbProperty("_links")
+    public Links getLinks() {
+        return Links.order(orderId);
     }
 
     @Override
     public int compareTo(Order o) {
         return date.compareTo(o.date) * -1;
-    }
-
-    @Override
-    public String toString() {
-        return "CustomerOrder{" +
-                "id='" + id + '\'' +
-                ", customerId='" + customerId + '\'' +
-                ", customer=" + customer +
-                ", address=" + address +
-                ", card=" + card +
-                ", items=" + items +
-                ", date=" + date +
-                '}';
-    }
-
-    // Crappy getter setters for Jackson
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getCustomerId() {
-        return this.customerId;
-    }
-
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public Card getCard() {
-        return card;
-    }
-
-    public void setCard(Card card) {
-        this.card = card;
-    }
-
-    public Collection<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(Collection<Item> items) {
-        this.items = items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public Shipment getShipment() {
-        return shipment;
-    }
-
-    public void setShipment(Shipment shipment) {
-        this.shipment = shipment;
-    }
-
-    public float getTotal() {
-        return total;
-    }
-
-    public void setTotal(float total) {
-        this.total = total;
-    }
-
-    @JsonbProperty("_links")
-    public Links getLinks() {
-        return Links.order(id);
     }
 }

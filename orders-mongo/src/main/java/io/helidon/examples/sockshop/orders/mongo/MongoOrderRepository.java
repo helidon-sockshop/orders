@@ -13,41 +13,49 @@ import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 import io.helidon.examples.sockshop.orders.Order;
 
 import com.mongodb.client.MongoCollection;
+import org.bson.BsonDocument;
 
 import static com.mongodb.client.model.Filters.eq;
 
 /**
- * @author Aleksandar Seovic  2020.01.16
+ * An implementation of {@link io.helidon.examples.sockshop.orders.OrderRepository}
+ * that that uses MongoDB as a backend data store.
  */
 @ApplicationScoped
 @Specializes
 public class MongoOrderRepository extends DefaultOrderRepository {
-    private static final Logger LOGGER = Logger.getLogger(MongoOrderRepository.class.getName());
+
+    private MongoCollection<Order> orders;
 
     @Inject
-    private MongoCollection<MongoOrder> orders;
+    MongoOrderRepository(MongoCollection<Order> orders) {
+        this.orders = orders;
+    }
 
     @Override
-    public MongoOrder getOrCreate(String orderId) {
-        MongoOrder order = orders.find(eq("id", orderId)).first();
-        if (order == null) {
-            order = new MongoOrder();
-        }
-        return order;
+    public Order get(String orderId) {
+        return orders.find(eq("orderId", orderId)).first();
     }
 
     @Override
     public Collection<? extends Order> findOrdersByCustomer(String customerId) {
-        ArrayList<MongoOrder> results = new ArrayList<>();
+        ArrayList<Order> results = new ArrayList<>();
 
-        orders.find(eq("customerId", customerId))
-                .forEach((Consumer<? super MongoOrder>) results::add);
+        orders.find(eq("customer._id", customerId))
+                .forEach((Consumer<? super Order>) results::add);
 
         return results;
     }
 
     @Override
     public void saveOrder(Order order) {
-        orders.insertOne(new MongoOrder(order));
+        orders.insertOne(order);
+    }
+
+    // ---- helpers ---------------------------------------------------------
+
+    @Override
+    public void clear() {
+        orders.deleteMany(new BsonDocument());
     }
 }

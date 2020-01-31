@@ -1,58 +1,43 @@
 package io.helidon.examples.sockshop.orders;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 
+import javax.json.bind.annotation.JsonbCreator;
+import javax.persistence.Embeddable;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+/**
+ * Shipment information received from the Shipping service.
+ */
+@Data
+@NoArgsConstructor
+@Embeddable
 public class Shipment implements Serializable {
-    private String orderId;
+    /**
+     * Shipping carrier.
+     */
+    private String carrier;
+
+    /**
+     * Tracking number.
+     */
     private String trackingNumber;
 
-    public Shipment() {
-    }
+    /**
+     * Estimated delivery date.
+     */
+    private LocalDate deliveryDate;
 
-    public Shipment(String orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
-    }
-
-    public String getTrackingNumber() {
-        return trackingNumber;
-    }
-
-    public void setTrackingNumber(String trackingNumber) {
+    @Builder
+    Shipment(String carrier, String trackingNumber, LocalDate deliveryDate) {
+        this.carrier = carrier;
         this.trackingNumber = trackingNumber;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Shipment shipment = (Shipment) o;
-        return orderId.equals(shipment.orderId) &&
-                trackingNumber.equals(shipment.trackingNumber);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(orderId, trackingNumber);
-    }
-
-    @Override
-    public String toString() {
-        return "Shipment{" +
-                "id='" + orderId + '\'' +
-                ", trackingNumber='" + trackingNumber + '\'' +
-                '}';
+        this.deliveryDate = deliveryDate;
     }
 }

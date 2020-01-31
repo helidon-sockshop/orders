@@ -2,100 +2,58 @@ package io.helidon.examples.sockshop.orders;
 
 import java.io.Serializable;
 
+import javax.json.bind.annotation.JsonbTransient;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.ManyToOne;
+
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+
+/**
+ * Representation of a single order item.
+ */
+@Data
+@NoArgsConstructor
+@Entity
+@IdClass(ItemId.class)
 public class Item implements Serializable {
-
-    private String id;
-
+    /**
+     * The item identifier.
+     */
+    @Id
     private String itemId;
+
+    /**
+     * The item quantity.
+     */
     private int quantity;
+
+    /**
+     * The item's price per unit.
+     */
     private float unitPrice;
 
-    public Item(String id, String itemId, int quantity, float unitPrice) {
-        this.id = id;
+    /**
+     * The order this item belongs to, for JPA optimization.
+     */
+    @Id
+    @ManyToOne
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @JsonbTransient
+    @BsonIgnore
+    private Order order;
+
+    @Builder
+    Item(String itemId, int quantity, float unitPrice) {
         this.itemId = itemId;
         this.quantity = quantity;
-        this.unitPrice = unitPrice;
-    }
-
-    public Item() {
-        this(null, "", 1, 0F);
-    }
-
-    public Item(String itemId) {
-        this(null, itemId, 1, 0F);
-    }
-
-    public Item(Item item, String id) {
-        this(id, item.itemId, item.quantity, item.unitPrice);
-    }
-
-    public Item(Item item, int quantity) {
-        this(item.id(), item.itemId, quantity, item.unitPrice);
-    }
-
-    public String id() {
-        return id;
-    }
-
-    public String itemId() {
-        return itemId;
-    }
-
-    public int quantity() {
-        return quantity;
-    }
-
-    @Override
-    public String toString() {
-        return "Item{" +
-                "id='" + id + '\'' +
-                ", itemId='" + itemId + '\'' +
-                ", quantity=" + quantity +
-                ", unitPrice=" + unitPrice +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Item item = (Item) o;
-
-        return itemId != null ? itemId.equals(item.itemId) : item.itemId == null;
-    }
-
-    // ****** Crappy getter/setters for Jackson JSON invoking ********
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(String itemId) {
-        this.itemId = itemId;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public float getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(float unitPrice) {
         this.unitPrice = unitPrice;
     }
 }

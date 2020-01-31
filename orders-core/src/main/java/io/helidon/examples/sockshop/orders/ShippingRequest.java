@@ -1,14 +1,19 @@
 package io.helidon.examples.sockshop.orders;
 
+import java.io.Serializable;
+
+import javax.persistence.Embeddable;
+
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * Payment request that is sent to Payment service for authorization.
+ * Shipping request that is sent to Shipping service for processing.
  */
 @Data
 @Builder
-public class PaymentRequest {
+public class ShippingRequest implements Serializable {
     /**
      * Order identifier.
      */
@@ -25,12 +30,7 @@ public class PaymentRequest {
     private Address address;
 
     /**
-     * Payment card details.
+     * The number of items in the order.
      */
-    private Card card;
-
-    /**
-     * Payment amount.
-     */
-    private float amount;
+    private int itemCount;
 }
