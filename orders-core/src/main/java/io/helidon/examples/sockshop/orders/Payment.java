@@ -1,5 +1,7 @@
 package io.helidon.examples.sockshop.orders;
 
+import java.io.Serializable;
+
 import javax.persistence.Embeddable;
 
 import lombok.Builder;
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Embeddable
-public class Payment {
+public class Payment implements Serializable {
     /**
      * Flag specifying whether the payment was authorized.
      */
