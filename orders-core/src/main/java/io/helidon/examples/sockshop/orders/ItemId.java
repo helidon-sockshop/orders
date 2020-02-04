@@ -5,7 +5,7 @@ import java.io.Serializable;
 import lombok.Data;
 
 /**
- * Composite key for the {@link Item class} when using JPA.
+ * Composite JPA key for the {@link Item} class.
  */
 @Data
 public class ItemId implements Serializable {

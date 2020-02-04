@@ -118,13 +118,13 @@ public class OrderResource {
 
         log.info("Processing Payment: " + paymentRequest);
 
-        URI paymentUri = URI.create(format("http://%s/payment", paymentHost));
+        URI paymentUri = URI.create(format("http://%s/payments", paymentHost));
         Payment payment = httpPost(paymentUri, Entity.json(paymentRequest), Payment.class);
 
         log.info("Payment processed: " + payment);
 
         if (payment == null) {
-            throw new PaymentDeclinedException("Unable to parse authorisation packet");
+            throw new PaymentDeclinedException("Unable to parse authorization packet");
         }
         if (!payment.isAuthorised()) {
             throw new PaymentDeclinedException(payment.getMessage());
