@@ -12,12 +12,15 @@ import javax.transaction.Transactional;
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 
+import org.eclipse.microprofile.opentracing.Traced;
+
 /**
  * An implementation of {@link io.helidon.examples.sockshop.orders.OrderRepository}
  * that that uses relational database (via JPA) as a backend data store.
  */
 @ApplicationScoped
 @Specializes
+@Traced
 public class JpaOrderRepository extends DefaultOrderRepository {
 
     @PersistenceContext

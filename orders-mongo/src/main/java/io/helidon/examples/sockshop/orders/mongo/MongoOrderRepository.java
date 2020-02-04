@@ -14,6 +14,7 @@ import io.helidon.examples.sockshop.orders.Order;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.BsonDocument;
+import org.eclipse.microprofile.opentracing.Traced;
 
 import static com.mongodb.client.model.Filters.eq;
 
@@ -23,6 +24,7 @@ import static com.mongodb.client.model.Filters.eq;
  */
 @ApplicationScoped
 @Specializes
+@Traced
 public class MongoOrderRepository extends DefaultOrderRepository {
 
     private MongoCollection<Order> orders;

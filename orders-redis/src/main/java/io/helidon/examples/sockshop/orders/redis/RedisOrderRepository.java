@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 import io.helidon.examples.sockshop.orders.Order;
 
+import org.eclipse.microprofile.opentracing.Traced;
 import org.redisson.api.RMap;
 
 /**
@@ -15,6 +16,7 @@ import org.redisson.api.RMap;
  */
 @ApplicationScoped
 @Specializes
+@Traced
 public class RedisOrderRepository extends DefaultOrderRepository {
     @Inject
     public RedisOrderRepository(RMap<String, Order> carts) {

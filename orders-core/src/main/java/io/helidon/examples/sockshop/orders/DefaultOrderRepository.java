@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.eclipse.microprofile.opentracing.Traced;
+
 /**
  * Simple in-memory implementation of {@link io.helidon.examples.sockshop.orders.OrderRepository}
  * that can be used for demos and testing.
@@ -16,6 +18,7 @@ import javax.enterprise.context.ApplicationScoped;
  * API testing and quick demos.
  */
 @ApplicationScoped
+@Traced
 public class DefaultOrderRepository implements OrderRepository {
     private Map<String, Order> orders;
 
