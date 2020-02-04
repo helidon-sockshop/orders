@@ -12,6 +12,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
 import org.jboss.weld.proxy.WeldClientProxy;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,11 @@ public class OrderResourceIT {
      */
     private static final Server SERVER = Server.builder().port(0).build().start();
     private OrderRepository orders;
+
+    @AfterAll
+    static void stopServer() {
+        SERVER.stop();
+    }
 
     @BeforeEach
     void setup() throws Exception {
