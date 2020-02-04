@@ -2,6 +2,7 @@ package io.helidon.examples.sockshop.orders;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -55,13 +56,13 @@ public class OrderResource {
      * Inject payment service host[:port] from configuration.
      */
     @ConfigProperty(name = "payment.host", defaultValue = "payment")
-    private String paymentHost;
+    private String paymentHost = "payment";
 
     /**
      * Inject shipping service host[:port] from configuration.
      */
     @ConfigProperty(name = "shipping.host", defaultValue = "shipping")
-    private String shippingHost;
+    private String shippingHost = "shipping";
 
     @GET
     @Path("search/customerId")
@@ -147,7 +148,7 @@ public class OrderResource {
 
         Order order = Order.builder()
                 .orderId(orderId)
-                .date(LocalDateTime.now())
+                .date(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .customer(customer)
                 .address(address)
                 .card(card)
@@ -191,6 +192,7 @@ public class OrderResource {
      * @return response from an HTTP GET, converted to {@code responseClass}
      */
     private <T> T httpGet(URI uri, Class<T> responseClass){
+        log.info("GET " + uri);
         return client
                 .target(uri)
                 .request(APPLICATION_JSON)
@@ -207,6 +209,7 @@ public class OrderResource {
      * @return response from an HTTP GET, converted to {@code responseClass}
      */
     private <T> T httpGet(URI uri, GenericType<T> responseClass){
+        log.info("GET " + uri);
         return client
                 .target(uri)
                 .request(APPLICATION_JSON)
@@ -223,6 +226,7 @@ public class OrderResource {
      * @return response from an HTTP POST, converted to {@code responseClass}
      */
     private <T> T httpPost(URI uri, Entity<?> entity, Class<T> responseClass) {
+        log.info("POST " + uri);
         return client
                 .target(uri)
                 .request(APPLICATION_JSON)

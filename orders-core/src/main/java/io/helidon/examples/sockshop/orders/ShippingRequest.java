@@ -25,7 +25,7 @@ public class ShippingRequest implements Serializable {
     private Customer customer;
 
     /**
-     * Billing address.
+     * Shipping address.
      */
     private Address address;
 

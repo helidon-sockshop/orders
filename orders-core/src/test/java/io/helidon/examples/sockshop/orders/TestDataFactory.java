@@ -2,6 +2,7 @@ package io.helidon.examples.sockshop.orders;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,7 @@ public class TestDataFactory {
 
         Order order = Order.builder()
                 .orderId(UUID.randomUUID().toString().substring(0, 8))
-                .date(LocalDateTime.now())
+                .date(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .customer(customer(customerId))
                 .address(address())
                 .card(card())

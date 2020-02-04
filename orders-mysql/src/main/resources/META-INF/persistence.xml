@@ -9,6 +9,11 @@
         <jta-data-source>orders-db</jta-data-source>
         <class>io.helidon.examples.sockshop.orders.Order</class>
         <class>io.helidon.examples.sockshop.orders.Item</class>
+        <class>io.helidon.examples.sockshop.orders.Address</class>
+        <class>io.helidon.examples.sockshop.orders.Card</class>
+        <class>io.helidon.examples.sockshop.orders.Customer</class>
+        <class>io.helidon.examples.sockshop.orders.Payment</class>
+        <class>io.helidon.examples.sockshop.orders.Shipment</class>
         <properties>
             <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
             <property name="eclipselink.deploy-on-startup" value="true"/>

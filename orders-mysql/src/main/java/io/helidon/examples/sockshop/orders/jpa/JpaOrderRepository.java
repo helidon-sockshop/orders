@@ -26,7 +26,7 @@ public class JpaOrderRepository extends DefaultOrderRepository {
     @Override
     @Transactional
     public Collection<? extends Order> findOrdersByCustomer(String customerId) {
-        String jql = "select o from Order as o where o.customer.id = :customerId";
+        String jql = "select o from Order as o where o.customer.id = :customerId order by o.date";
         TypedQuery<Order> query = em.createQuery(jql, Order.class);
         query.setParameter("customerId", customerId);
 

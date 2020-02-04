@@ -39,11 +39,6 @@ public class OrderResourceIT {
     private static final Server SERVER = Server.builder().port(0).build().start();
     private OrderRepository orders;
 
-    @AfterAll
-    static void stopServer() {
-        SERVER.stop();
-    }
-
     @BeforeEach
     void setup() throws Exception {
         // Configure RestAssured to run tests against our application
@@ -165,7 +160,7 @@ public class OrderResourceIT {
                 post("/orders").
         then().
                 statusCode(NOT_ACCEPTABLE.getStatusCode())
-                .body("message", is("Unable to parse authorisation packet"));
+                .body("message", is("Unable to parse authorization packet"));
     }
 
     @Test
