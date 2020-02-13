@@ -66,6 +66,10 @@
           <version>${version.lib.mysql}</version>
         </dependency>
         <dependency>
+            <groupId>io.helidon.common</groupId>
+            <artifactId>helidon-common-configurable</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.helidon.integrations.cdi</groupId>
             <artifactId>helidon-integrations-cdi-datasource-hikaricp</artifactId>
             <scope>runtime</scope>

@@ -24,20 +24,20 @@ public abstract class OrderRepositoryTest {
 
     @Test
     void testFindOrdersByCustomer() {
-        orders.saveOrder(order("homer", 1));
-        orders.saveOrder(order("homer", 2));
-        orders.saveOrder(order("marge", 5));
+        orders.saveOrder(order("homer", 1)).toCompletableFuture().join();
+        orders.saveOrder(order("homer", 2)).toCompletableFuture().join();
+        orders.saveOrder(order("marge", 5)).toCompletableFuture().join();
 
-        assertThat(orders.findOrdersByCustomer("homer").size(), is(2));
-        assertThat(orders.findOrdersByCustomer("marge").size(), is(1));
+        assertThat(orders.findOrdersByCustomer("homer").toCompletableFuture().join().size(), is(2));
+        assertThat(orders.findOrdersByCustomer("marge").toCompletableFuture().join().size(), is(1));
     }
 
     @Test
     void testOrderCreation() {
         Order order = order("homer", 1);
-        orders.saveOrder(order);
+        orders.saveOrder(order).toCompletableFuture().join();
 
-        assertThat(orders.get(order.getOrderId()), is(order));
+        assertThat(orders.get(order.getOrderId()).toCompletableFuture().join(), is(order));
     }
 
 }

@@ -2,6 +2,8 @@ package io.helidon.examples.sockshop.orders;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -39,20 +41,21 @@ public class DefaultOrderRepository implements OrderRepository {
     }
 
     @Override
-    public Collection<? extends Order> findOrdersByCustomer(String customerId) {
-        return orders.values().stream()
+    public CompletionStage<Collection<? extends Order>> findOrdersByCustomer(String customerId) {
+        return CompletableFuture.completedStage(orders.values().stream()
                 .filter(order -> order.getCustomer().getId().equals(customerId))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     @Override
-    public Order get(String orderId) {
-        return orders.get(orderId);
+    public CompletionStage<Order> get(String orderId) {
+        return CompletableFuture.completedStage(orders.get(orderId));
     }
 
     @Override
-    public void saveOrder(Order order) {
+    public CompletionStage saveOrder(Order order) {
         orders.put(order.getOrderId(), order);
+        return CompletableFuture.completedStage(null);
     }
 
     // ---- helpers ---------------------------------------------------------
@@ -60,7 +63,8 @@ public class DefaultOrderRepository implements OrderRepository {
     /**
      * Helper to clear this repository for testing.
      */
-    public void clear() {
+    public CompletionStage clear() {
         orders.clear();
+        return CompletableFuture.completedStage(null);
     }
 }

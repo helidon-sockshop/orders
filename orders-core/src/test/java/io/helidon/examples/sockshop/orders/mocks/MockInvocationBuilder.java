@@ -2,8 +2,10 @@ package io.helidon.examples.sockshop.orders.mocks;
 
 import java.net.URI;
 import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
 
 import javax.ws.rs.client.AsyncInvoker;
+import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.CompletionStageRxInvoker;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
@@ -104,7 +106,7 @@ public class MockInvocationBuilder implements Invocation.Builder {
 
     @Override
     public AsyncInvoker async() {
-        return null;
+        return new RInvoker();
     }
 
     @Override
@@ -164,7 +166,7 @@ public class MockInvocationBuilder implements Invocation.Builder {
 
     @Override
     public CompletionStageRxInvoker rx() {
-        return null;
+        return new RInvoker();
     }
 
     @Override
@@ -280,5 +282,186 @@ public class MockInvocationBuilder implements Invocation.Builder {
     @Override
     public <T> T method(String s, Entity<?> entity, GenericType<T> genericType) {
         return null;
+    }
+
+
+    protected class RInvoker implements CompletionStageRxInvoker, AsyncInvoker {
+        @Override
+        public CompletableFuture<Response> get() {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.get());
+        }
+
+        @Override
+        public <T> CompletableFuture<T> get(Class<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.get(responseType));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> get(GenericType<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.get(responseType));
+        }
+
+        public <T> CompletableFuture<T> get(InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        @Override
+        public CompletableFuture<Response> put(Entity<?> entity) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.put(entity));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> put(Entity<?> entity, Class<T> clazz) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.put(entity, clazz));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> put(Entity<?> entity, GenericType<T> type) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.put(entity, type));
+        }
+
+        public <T> CompletableFuture<T> put(Entity<?> entity, InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        @Override
+        public CompletableFuture<Response> post(Entity<?> entity) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.post(entity));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> post(Entity<?> entity, Class<T> clazz) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.post(entity, clazz));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> post(Entity<?> entity, GenericType<T> type) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.post(entity, type));
+        }
+
+        public <T> CompletableFuture<T> post(Entity<?> entity, InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        @Override
+        public CompletableFuture<Response> delete() {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.delete());
+        }
+
+        @Override
+        public <T> CompletableFuture<T> delete(Class<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.delete(responseType));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> delete(GenericType<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.delete(responseType));
+        }
+
+        public <T> CompletableFuture<T> delete(InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        @Override
+        public CompletableFuture<Response> head() {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.head());
+        }
+
+        public CompletableFuture<Response> head(InvocationCallback<Response> callback) {
+            return head().thenApply(r -> { callback.completed(r); return r; })
+                         .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        @Override
+        public CompletableFuture<Response> options() {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.options());
+        }
+
+        @Override
+        public <T> CompletableFuture<T> options(Class<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.options(responseType));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> options(GenericType<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.options(responseType));
+        }
+
+        public <T> CompletableFuture<T> options(InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        @Override
+        public CompletableFuture<Response> trace() {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.trace());
+        }
+
+        @Override
+        public <T> CompletableFuture<T> trace(Class<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.trace(responseType));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> trace(GenericType<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.trace(responseType));
+        }
+
+        public <T> CompletableFuture<T> trace(InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        @Override
+        public CompletableFuture<Response> method(String name) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.method(name));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> method(String name, Class<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.method(name, responseType));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> method(String name, GenericType<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.method(name, responseType));
+        }
+
+        @Override
+        public CompletableFuture<Response> method(String name, Entity<?> entity) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.method(name, entity));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> method(String name, Entity<?> entity, Class<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.method(name, entity, responseType));
+        }
+
+        @Override
+        public <T> CompletableFuture<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
+            return CompletableFuture.completedFuture(MockInvocationBuilder.this.method(name, entity, responseType));
+        }
+
+        public <T> CompletableFuture<T> method(String name, InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
+
+        public <T> CompletableFuture<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
+            return CompletableFuture.<T>failedFuture(new Exception("Mock Client does not implement these"))
+                                    .thenApply(r -> { callback.completed(r); return r; })
+                                    .exceptionally(th -> { callback.failed(th); return null; });
+        }
     }
 }

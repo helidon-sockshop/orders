@@ -1,5 +1,8 @@
 package io.helidon.examples.sockshop.orders.redis;
 
+import java.util.Collection;
+import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Specializes;
 import javax.inject.Inject;
@@ -18,8 +21,34 @@ import org.redisson.api.RMap;
 @Specializes
 @Traced
 public class RedisOrderRepository extends DefaultOrderRepository {
+    protected RMap<String, Order> carts;
+
     @Inject
     public RedisOrderRepository(RMap<String, Order> carts) {
-        super(carts);
+        this.carts = carts;
+    }
+
+    @Override
+    public CompletionStage<Collection<? extends Order>> findOrdersByCustomer(String customerId) {
+        return carts.readAllValuesAsync()
+                    .thenApply(vs -> vs.stream()
+                                     .filter(order -> order.getCustomer().getId().equals(customerId))
+                                     .collect(Collectors.toList()));
+    }
+
+    @Override
+    public CompletionStage<Order> get(String orderId) {
+        return carts.getAsync(orderId);
+    }
+
+    @Override
+    public CompletionStage saveOrder(Order order) {
+        return carts.putAsync(order.getOrderId(), order);
+    }
+
+    @Override
+    public CompletionStage clear() {
+        return carts.readAllKeySetAsync()
+                    .thenApply(ks -> carts.fastRemoveAsync(ks.toArray(new String[ks.size()])));
     }
 }

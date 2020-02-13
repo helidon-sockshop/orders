@@ -63,6 +63,12 @@
             <artifactId>bson</artifactId>
             <version>${version.lib.mongo}</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.30</version>
+        </dependency>
+
 
         <!-- test dependencies -->
         <dependency>

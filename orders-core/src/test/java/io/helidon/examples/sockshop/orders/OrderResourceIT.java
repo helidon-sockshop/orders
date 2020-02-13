@@ -47,11 +47,7 @@ public class OrderResourceIT {
 
         orders = SERVER.cdiContainer().select(OrderRepository.class).get();
 
-        // oh, boy... not pretty, but probably the best we can do
-        // without adding clear() to public interface
-        WeldClientProxy proxy = (WeldClientProxy) orders;
-        Object o = proxy.getMetadata().getContextualInstance();
-        o.getClass().getMethod("clear").invoke(o);
+        ((DefaultOrderRepository) orders).clear().toCompletableFuture().join();
     }
 
     @Test
@@ -65,7 +61,7 @@ public class OrderResourceIT {
     @Test
     void testGetOrder() {
         Order order = order("homer", 1);
-        orders.saveOrder(order);
+        orders.saveOrder(order).toCompletableFuture().join();
         Order saved = get("/orders/{orderId}", order.getOrderId()).as(Order.class, ObjectMapperType.JSONB);
 
         assertThat(saved, is(order));
@@ -73,9 +69,9 @@ public class OrderResourceIT {
 
     @Test
     void testFindOrdersByCustomerId() {
-        orders.saveOrder(order("homer", 1));
-        orders.saveOrder(order("homer", 2));
-        orders.saveOrder(order("marge", 5));
+        orders.saveOrder(order("homer", 1)).toCompletableFuture().join();
+        orders.saveOrder(order("homer", 2)).toCompletableFuture().join();
+        orders.saveOrder(order("marge", 5)).toCompletableFuture().join();
 
         given().
                 queryParam("custId", "homer").

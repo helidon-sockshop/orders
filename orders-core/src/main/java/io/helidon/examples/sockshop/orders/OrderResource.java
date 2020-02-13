@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -20,6 +22,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
@@ -67,49 +71,63 @@ public class OrderResource {
     @GET
     @Path("search/customerId")
     @Produces(APPLICATION_JSON)
-    public Response getOrdersForCustomer(@QueryParam("custId") String customerId) {
-        Collection<? extends Order> customerOrders = orders.findOrdersByCustomer(customerId);
-        if (customerOrders.isEmpty()) {
-            return Response.status(NOT_FOUND).build();
-        }
-        return wrap(customerOrders);
+    public void getOrdersForCustomer(@QueryParam("custId") String customerId, @Suspended AsyncResponse response) {
+        orders.findOrdersByCustomer(customerId)
+              .thenApply(customerOrders -> {
+                  if (customerOrders.isEmpty()) {
+                      return response.resume(Response.status(NOT_FOUND).build());
+                  }
+
+                  return response.resume(wrap(customerOrders));
+              })
+              .exceptionally(response::resume);
     }
 
-    private Response wrap(Object value) {
-        Map<String, Map<String, Object>> map = Collections.singletonMap("_embedded", Collections.singletonMap("customerOrders", value));
-        return Response.ok(map).build();
+    private Map<String, Map<String, Object>> wrap(Object value) {
+        return Collections.singletonMap("_embedded", Collections.singletonMap("customerOrders", value));
     }
 
     @GET
     @Path("{id}")
     @Produces(APPLICATION_JSON)
-    public Response getOrder(@PathParam("id") String orderId) {
-        Order order = orders.get(orderId);
-        return order == null
-                ? Response.status(NOT_FOUND).build()
-                : Response.ok(order).build();
+    public void getOrder(@PathParam("id") String orderId, @Suspended AsyncResponse response) {
+        orders.get(orderId)
+              .thenApply(order -> {
+                  if (order == null) {
+                      return response.resume(Response.status(NOT_FOUND).build());
+                  }
+                  return response.resume(order);
+              })
+              .exceptionally(response::resume);
     }
 
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response newOrder(@Context UriInfo uriInfo, NewOrderRequest request) {
+    public void newOrder(@Context UriInfo uriInfo, NewOrderRequest request, @Suspended AsyncResponse response) {
         log.info("Processing new order: " + request);
 
         if (request.address == null || request.customer == null || request.card == null || request.items == null) {
-            throw new InvalidOrderException("Invalid order request. Order requires customer, address, card and items.");
+            response.resume(new InvalidOrderException("Invalid order request. Order requires customer, address, card and items."));
+            return;
         }
 
-        List<Item> items    = httpGet(request.items, new GenericType<List<Item>>() { });
-        Address    address  = httpGet(request.address, Address.class);
-        Card       card     = httpGet(request.card, Card.class);
-        Customer   customer = httpGet(request.customer, Customer.class);
+        CompletableFuture<List<Item>> csitems    = httpGet(request.items, new GenericType<List<Item>>() { }).toCompletableFuture();
+        CompletableFuture<Address>    csaddress  = httpGet(request.address, Address.class).toCompletableFuture();
+        CompletableFuture<Card>       cscard     = httpGet(request.card, Card.class).toCompletableFuture();
+        CompletableFuture<Customer>   cscustomer = httpGet(request.customer, Customer.class).toCompletableFuture();
 
-        String orderId = UUID.randomUUID().toString().substring(0, 8);
-        float  amount  = calculateTotal(items);
+        CompletableFuture.allOf(csitems, csaddress, cscard, cscustomer).thenCompose((_void) -> {
+           List<Item> items = csitems.join();
+           Address address = csaddress.join();
+           Card card = cscard.join();
+           Customer customer = cscustomer.join();
 
-        // Process payment
-        PaymentRequest paymentRequest = PaymentRequest.builder()
+           String orderId = UUID.randomUUID().toString().substring(0, 8);
+           float  amount  = calculateTotal(items);
+
+           // Process payment
+           PaymentRequest paymentRequest = PaymentRequest.builder()
                 .orderId(orderId)
                 .customer(customer)
                 .address(address)
@@ -117,52 +135,65 @@ public class OrderResource {
                 .amount(amount)
                 .build();
 
-        log.info("Processing Payment: " + paymentRequest);
+           log.info("Processing Payment: " + paymentRequest);
 
-        URI paymentUri = URI.create(format("http://%s/payments", paymentHost));
-        Payment payment = httpPost(paymentUri, Entity.json(paymentRequest), Payment.class);
+           URI paymentUri = URI.create(format("http://%s/payments", paymentHost));
+           return httpPost(paymentUri, Entity.json(paymentRequest), Payment.class).thenCompose(payment -> {
+              log.info("Payment processed: " + payment);
 
-        log.info("Payment processed: " + payment);
+              if (payment == null) {
+                  // Is it helidon, Jersey, or not supported? ExceptionMapper does not kick in
+                  response.resume(Response.status(406)
+                                          .entity(Collections.singletonMap("message", "Unable to parse authorization packet"))
+                                          .type(APPLICATION_JSON)
+                                          .build());
+                  throw new PaymentDeclinedException("Unable to parse authorization packet");
+              }
+              if (!payment.isAuthorised()) {
+                  // Is it helidon, Jersey, or not supported? ExceptionMapper does not kick in
+                  response.resume(Response.status(406)
+                                          .entity(Collections.singletonMap("message", payment.getMessage()))
+                                          .type(APPLICATION_JSON)
+                                          .build());
+                  throw new PaymentDeclinedException(payment.getMessage());
+              }
 
-        if (payment == null) {
-            throw new PaymentDeclinedException("Unable to parse authorization packet");
-        }
-        if (!payment.isAuthorised()) {
-            throw new PaymentDeclinedException(payment.getMessage());
-        }
-
-        // Create shipment
-        ShippingRequest shippingRequest = ShippingRequest.builder()
+              // Create shipment
+              ShippingRequest shippingRequest = ShippingRequest.builder()
                 .orderId(orderId)
                 .customer(customer)
                 .address(address)
                 .itemCount(items.size())
                 .build();
 
-        log.info("Creating Shipment: " + shippingRequest);
+              log.info("Creating Shipment: " + shippingRequest);
 
-        URI shippingUri = URI.create(format("http://%s/shipping", shippingHost));
-        Shipment shipment = httpPost(shippingUri, Entity.json(shippingRequest), Shipment.class);
+              URI shippingUri = URI.create(format("http://%s/shipping", shippingHost));
+              return httpPost(shippingUri, Entity.json(shippingRequest), Shipment.class).thenCompose(shipment -> {
+                 log.info("Created Shipment: " + shipment);
 
-        log.info("Created Shipment: " + shipment);
+                 Order order = Order.builder()
+                   .orderId(orderId)
+                   .date(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+                   .customer(customer)
+                   .address(address)
+                   .card(card)
+                   .items(items)
+                   .payment(payment)
+                   .shipment(shipment)
+                   .total(amount)
+                   .build();
+                 order.getItems().forEach(item -> item.setOrder(order));
 
-        Order order = Order.builder()
-                .orderId(orderId)
-                .date(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-                .customer(customer)
-                .address(address)
-                .card(card)
-                .items(items)
-                .payment(payment)
-                .shipment(shipment)
-                .total(amount)
-                .build();
-        order.getItems().forEach(item -> item.setOrder(order));
-
-        orders.saveOrder(order);
-
-        log.info("Created Order: " + orderId);
-        return Response.status(CREATED).entity(order).build();
+                 return orders.saveOrder(order).thenApply((_ignore) -> {
+                    log.info("Created Order: " + orderId);
+                    return Response.status(CREATED).entity(order).build();
+                 });
+              });
+           });
+        })
+           .thenApply(response::resume)
+           .exceptionally(response::resume);
     }
 
     // ---- helper methods --------------------------------------------------
@@ -191,11 +222,12 @@ public class OrderResource {
      *
      * @return response from an HTTP GET, converted to {@code responseClass}
      */
-    private <T> T httpGet(URI uri, Class<T> responseClass){
+    private <T> CompletionStage<T> httpGet(URI uri, Class<T> responseClass){
         log.info("GET " + uri);
         return client
                 .target(uri)
                 .request(APPLICATION_JSON)
+                .rx()
                 .get(responseClass);
     }
 
@@ -208,11 +240,12 @@ public class OrderResource {
      *
      * @return response from an HTTP GET, converted to {@code responseClass}
      */
-    private <T> T httpGet(URI uri, GenericType<T> responseClass){
+    private <T> CompletionStage<T> httpGet(URI uri, GenericType<T> responseClass){
         log.info("GET " + uri);
         return client
                 .target(uri)
                 .request(APPLICATION_JSON)
+                .rx()
                 .get(responseClass);
     }
 
@@ -225,11 +258,12 @@ public class OrderResource {
      *
      * @return response from an HTTP POST, converted to {@code responseClass}
      */
-    private <T> T httpPost(URI uri, Entity<?> entity, Class<T> responseClass) {
+    private <T> CompletionStage<T> httpPost(URI uri, Entity<?> entity, Class<T> responseClass) {
         log.info("POST " + uri);
         return client
                 .target(uri)
                 .request(APPLICATION_JSON)
+                .rx()
                 .post(entity, responseClass);
     }
 

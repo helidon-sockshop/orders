@@ -1,6 +1,7 @@
 package io.helidon.examples.sockshop.orders;
 
 import java.util.Collection;
+import java.util.concurrent.CompletionStage;
 
 /**
  * A repository interface that should be implemented by
@@ -14,7 +15,7 @@ public interface OrderRepository {
      *
      * @return all orders for the specified customer
      */
-    Collection<? extends Order> findOrdersByCustomer(String customerId);
+    CompletionStage<Collection<? extends Order>> findOrdersByCustomer(String customerId);
 
     /**
      * Get an existing order.
@@ -24,12 +25,12 @@ public interface OrderRepository {
      * @return an existing order, or {@code null} if the specified order
      *         does not exist
      */
-    Order get(String orderId);
+    CompletionStage<Order> get(String orderId);
 
     /**
      * Save order.
      *
      * @param order the order to save
      */
-    void saveOrder(Order order);
+    CompletionStage saveOrder(Order order);
 }

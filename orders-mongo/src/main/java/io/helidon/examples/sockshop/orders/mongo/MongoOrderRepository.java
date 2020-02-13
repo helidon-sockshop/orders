@@ -2,6 +2,8 @@ package io.helidon.examples.sockshop.orders.mongo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -12,7 +14,8 @@ import javax.inject.Inject;
 import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 import io.helidon.examples.sockshop.orders.Order;
 
-import com.mongodb.client.MongoCollection;
+import com.mongodb.async.client.MongoCollection;
+import com.mongodb.async.SingleResultCallback;
 import org.bson.BsonDocument;
 import org.eclipse.microprofile.opentracing.Traced;
 
@@ -35,29 +38,47 @@ public class MongoOrderRepository extends DefaultOrderRepository {
     }
 
     @Override
-    public Order get(String orderId) {
-        return orders.find(eq("orderId", orderId)).first();
+    public CompletionStage<Order> get(String orderId) {
+        CompletableFuture<Order> cf = new CompletableFuture<>();
+
+        orders.find(eq("orderId", orderId))
+              .first(complete(cf));
+        return cf;
     }
 
     @Override
-    public Collection<? extends Order> findOrdersByCustomer(String customerId) {
+    public CompletionStage<Collection<? extends Order>> findOrdersByCustomer(String customerId) {
         ArrayList<Order> results = new ArrayList<>();
 
+        CompletableFuture<ArrayList<Order>> cf = new CompletableFuture<>();
         orders.find(eq("customer._id", customerId))
-                .forEach((Consumer<? super Order>) results::add);
+              .into(results, complete(cf));
 
-        return results;
+        return cf.thenApply(t -> t);
     }
 
     @Override
-    public void saveOrder(Order order) {
-        orders.insertOne(order);
+    public CompletionStage saveOrder(Order order) {
+        CompletableFuture cf = new CompletableFuture();
+        orders.insertOne(order, complete(cf));
+        return cf;
     }
 
     // ---- helpers ---------------------------------------------------------
 
-    @Override
-    public void clear() {
-        orders.deleteMany(new BsonDocument());
+    public CompletionStage clear() {
+        CompletableFuture cf = new CompletableFuture();
+        orders.deleteMany(new BsonDocument(), complete(cf));
+        return cf;
+    }
+
+    protected static <T> SingleResultCallback<T> complete(CompletableFuture<T> cf) {
+        return (r, th) -> {
+                if (th == null) {
+                    cf.complete(r);
+                } else {
+                    cf.completeExceptionally(th);
+                }
+            };
     }
 }
