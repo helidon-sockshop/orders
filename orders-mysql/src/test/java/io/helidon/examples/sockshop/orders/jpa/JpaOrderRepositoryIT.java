@@ -15,12 +15,7 @@ public class JpaOrderRepositoryIT extends OrderRepositoryTest {
      * Starting server on ephemeral port in order to be able to get the
      * fully configured repository from the CDI container.
      */
-    private static final Server SERVER = Server.builder().port(0).build().start();
-
-    @AfterAll
-    static void stopServer() {
-        SERVER.stop();
-    }
+    private static final Server SERVER = JpaOrderResourceIT.SERVER;
 
     @Override
     protected OrderRepository getOrderRepository() {
