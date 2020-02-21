@@ -47,11 +47,7 @@ public class OrderResourceIT {
 
         orders = SERVER.cdiContainer().select(OrderRepository.class).get();
 
-        // oh, boy... not pretty, but probably the best we can do
-        // without adding clear() to public interface
-        WeldClientProxy proxy = (WeldClientProxy) orders;
-        Object o = proxy.getMetadata().getContextualInstance();
-        o.getClass().getMethod("clear").invoke(o);
+        ((TestOrderRepository) orders).clear();
     }
 
     @Test

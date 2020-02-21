@@ -19,11 +19,7 @@ public class JpaOrderRepositoryIT extends OrderRepositoryTest {
 
     @Override
     protected OrderRepository getOrderRepository() {
+        // using CDI, because only this way we can interact with @Transactional annotations
         return SERVER.cdiContainer().select(OrderRepository.class).get();
-    }
-
-    @Override
-    protected void clearRepository(OrderRepository orders) {
-        ((JpaOrderRepository) orders).clear();
     }
 }

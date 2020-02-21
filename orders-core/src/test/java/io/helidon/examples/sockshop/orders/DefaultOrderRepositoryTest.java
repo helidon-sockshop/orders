@@ -6,11 +6,6 @@ package io.helidon.examples.sockshop.orders;
 public class DefaultOrderRepositoryTest extends OrderRepositoryTest {
     @Override
     protected OrderRepository getOrderRepository() {
-        return new DefaultOrderRepository();
-    }
-
-    @Override
-    protected void clearRepository(OrderRepository orders) {
-        ((DefaultOrderRepository) orders).clear();
+        return new TestDefaultOrderRepository();
     }
 }

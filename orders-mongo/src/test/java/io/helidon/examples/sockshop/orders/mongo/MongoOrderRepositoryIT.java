@@ -15,11 +15,6 @@ class MongoOrderRepositoryIT extends OrderRepositoryTest {
         String host = System.getProperty("db.host","localhost");
         int    port = Integer.parseInt(System.getProperty("db.port","27017"));
 
-        return new MongoOrderRepository(orders(db(client(host, port))));
-    }
-
-    @Override
-    protected void clearRepository(OrderRepository orders) {
-        ((MongoOrderRepository) orders).clear();
+        return new TestMongoOrderRepository(orders(db(client(host, port))));
     }
 }
