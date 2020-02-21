@@ -7,16 +7,17 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Specializes;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import javax.interceptor.Interceptor;
 
-import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 import io.helidon.examples.sockshop.orders.Order;
+import io.helidon.examples.sockshop.orders.OrderRepository;
 
 import com.mongodb.async.client.MongoCollection;
 import com.mongodb.async.SingleResultCallback;
-import org.bson.BsonDocument;
 import org.eclipse.microprofile.opentracing.Traced;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -26,11 +27,11 @@ import static com.mongodb.client.model.Filters.eq;
  * that that uses MongoDB as a backend data store.
  */
 @ApplicationScoped
-@Specializes
+@Alternative
+@Priority(Interceptor.Priority.APPLICATION+10)
 @Traced
-public class MongoOrderRepository extends DefaultOrderRepository {
-
-    private MongoCollection<Order> orders;
+public class MongoOrderRepository implements OrderRepository {
+    protected MongoCollection<Order> orders;
 
     @Inject
     MongoOrderRepository(MongoCollection<Order> orders) {
@@ -65,12 +66,6 @@ public class MongoOrderRepository extends DefaultOrderRepository {
     }
 
     // ---- helpers ---------------------------------------------------------
-
-    public CompletionStage clear() {
-        CompletableFuture cf = new CompletableFuture();
-        orders.deleteMany(new BsonDocument(), complete(cf));
-        return cf;
-    }
 
     protected static <T> SingleResultCallback<T> complete(CompletableFuture<T> cf) {
         return (r, th) -> {

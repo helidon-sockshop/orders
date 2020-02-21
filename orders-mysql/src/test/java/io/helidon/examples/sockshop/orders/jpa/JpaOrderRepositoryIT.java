@@ -24,6 +24,6 @@ public class JpaOrderRepositoryIT extends OrderRepositoryTest {
 
     @Override
     protected void clearRepository(OrderRepository orders) {
-        ((JpaOrderRepository) orders).clear().toCompletableFuture().join();
+        ClearJpaOrderRepository.clearRepository((ClearJpaOrderRepository) orders).toCompletableFuture().join();
     }
 }

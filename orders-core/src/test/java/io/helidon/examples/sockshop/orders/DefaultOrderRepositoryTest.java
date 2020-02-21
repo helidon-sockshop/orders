@@ -11,6 +11,6 @@ public class DefaultOrderRepositoryTest extends OrderRepositoryTest {
 
     @Override
     protected void clearRepository(OrderRepository orders) {
-        ((DefaultOrderRepository) orders).clear().toCompletableFuture().join();
+        ClearDefaultOrderRepository.clearRepository((DefaultOrderRepository) orders);
     }
 }

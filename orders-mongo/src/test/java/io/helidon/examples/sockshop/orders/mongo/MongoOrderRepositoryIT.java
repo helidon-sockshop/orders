@@ -20,6 +20,6 @@ class MongoOrderRepositoryIT extends OrderRepositoryTest {
 
     @Override
     protected void clearRepository(OrderRepository orders) {
-        ((MongoOrderRepository) orders).clear().toCompletableFuture().join();
+        ClearMongoOrderRepository.clearRepository((MongoOrderRepository) orders).toCompletableFuture().join();
     }
 }

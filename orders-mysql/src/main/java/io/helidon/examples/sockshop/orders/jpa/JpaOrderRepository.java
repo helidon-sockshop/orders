@@ -8,9 +8,11 @@ import java.util.concurrent.ExecutorService;
 
 import java.util.function.Supplier;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Specializes;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import javax.interceptor.Interceptor;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -19,7 +21,7 @@ import javax.transaction.Transactional;
 import io.helidon.common.configurable.ThreadPoolSupplier;
 
 import io.helidon.examples.sockshop.orders.Order;
-import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
+import io.helidon.examples.sockshop.orders.OrderRepository;
 
 import org.eclipse.microprofile.opentracing.Traced;
 
@@ -28,10 +30,13 @@ import org.eclipse.microprofile.opentracing.Traced;
  * that that uses relational database (via JPA) as a backend data store.
  */
 @ApplicationScoped
-@Specializes
+@Alternative
+@Priority(Interceptor.Priority.APPLICATION+10)
 @Traced
-public class JpaOrderRepository extends DefaultOrderRepository {
+public class JpaOrderRepository implements OrderRepository {
     @ApplicationScoped
+    @Alternative
+    @Priority(Interceptor.Priority.APPLICATION+10)
     @Traced
     protected static class SyncOrderRepository {
        @Inject
@@ -55,14 +60,9 @@ public class JpaOrderRepository extends DefaultOrderRepository {
        }
 
        @Transactional
-       public void saveOrderSync(Order order) {
+       public boolean saveOrderSync(Order order) {
           em.persist(order);
-       }
-
-       @Transactional
-       public void clearSync() {
-          em.createQuery("delete from Item").executeUpdate();
-          em.createQuery("delete from Order").executeUpdate();
+          return true;
        }
     }
 
@@ -88,12 +88,7 @@ public class JpaOrderRepository extends DefaultOrderRepository {
 
     @Override
     public CompletionStage saveOrder(Order order) {
-        return CompletableFuture.supplyAsync(() -> {repo.saveOrderSync(order); return true;}, es);
-    }
-
-    @Override
-    public CompletionStage clear() {
-        return CompletableFuture.supplyAsync(() -> {repo.clearSync(); return true;}, es);
+        return CompletableFuture.supplyAsync(() -> repo.saveOrderSync(order), es);
     }
 
 }

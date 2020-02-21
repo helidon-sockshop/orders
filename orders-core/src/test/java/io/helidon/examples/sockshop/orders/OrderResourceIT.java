@@ -47,7 +47,7 @@ public class OrderResourceIT {
 
         orders = SERVER.cdiContainer().select(OrderRepository.class).get();
 
-        ((DefaultOrderRepository) orders).clear().toCompletableFuture().join();
+        ((ClearOrderRepository) orders).clear().toCompletableFuture().join();
     }
 
     @Test

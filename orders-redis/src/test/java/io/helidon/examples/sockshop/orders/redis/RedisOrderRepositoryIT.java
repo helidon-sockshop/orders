@@ -19,6 +19,6 @@ class RedisOrderRepositoryIT extends OrderRepositoryTest {
 
     @Override
     protected void clearRepository(OrderRepository orders) {
-        ((RedisOrderRepository) orders).clear();
+        ClearRedisOrderRepository.clearRepository((RedisOrderRepository) orders).toCompletableFuture().join();
     }
 }

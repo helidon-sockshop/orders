@@ -7,7 +7,10 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
+import javax.interceptor.Interceptor;
 
 import org.eclipse.microprofile.opentracing.Traced;
 
@@ -20,9 +23,11 @@ import org.eclipse.microprofile.opentracing.Traced;
  * API testing and quick demos.
  */
 @ApplicationScoped
+@Alternative
+@Priority(Interceptor.Priority.APPLICATION+1)
 @Traced
 public class DefaultOrderRepository implements OrderRepository {
-    private Map<String, Order> orders;
+    protected Map<String, Order> orders;
 
     /**
      * Construct {@code DefaultOrderRepository} with empty storage map.
@@ -55,16 +60,6 @@ public class DefaultOrderRepository implements OrderRepository {
     @Override
     public CompletionStage saveOrder(Order order) {
         orders.put(order.getOrderId(), order);
-        return CompletableFuture.completedStage(null);
-    }
-
-    // ---- helpers ---------------------------------------------------------
-
-    /**
-     * Helper to clear this repository for testing.
-     */
-    public CompletionStage clear() {
-        orders.clear();
         return CompletableFuture.completedStage(null);
     }
 }

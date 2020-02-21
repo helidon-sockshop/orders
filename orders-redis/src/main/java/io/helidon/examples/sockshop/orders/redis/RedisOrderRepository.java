@@ -3,12 +3,14 @@ package io.helidon.examples.sockshop.orders.redis;
 import java.util.Collection;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Specializes;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import javax.interceptor.Interceptor;
 
-import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 import io.helidon.examples.sockshop.orders.Order;
+import io.helidon.examples.sockshop.orders.OrderRepository;
 
 import org.eclipse.microprofile.opentracing.Traced;
 import org.redisson.api.RMap;
@@ -18,9 +20,10 @@ import org.redisson.api.RMap;
  * that that uses Redis (via Redisson) as a backend data store.
  */
 @ApplicationScoped
-@Specializes
+@Alternative
+@Priority(Interceptor.Priority.APPLICATION+10)
 @Traced
-public class RedisOrderRepository extends DefaultOrderRepository {
+public class RedisOrderRepository implements OrderRepository {
     protected RMap<String, Order> carts;
 
     @Inject
@@ -44,11 +47,5 @@ public class RedisOrderRepository extends DefaultOrderRepository {
     @Override
     public CompletionStage saveOrder(Order order) {
         return carts.putAsync(order.getOrderId(), order);
-    }
-
-    @Override
-    public CompletionStage clear() {
-        return carts.readAllKeySetAsync()
-                    .thenApply(ks -> carts.fastRemoveAsync(ks.toArray(new String[ks.size()])));
     }
 }
