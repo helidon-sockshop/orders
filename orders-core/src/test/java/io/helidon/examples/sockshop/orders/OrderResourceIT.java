@@ -36,7 +36,7 @@ public class OrderResourceIT {
      * This will start the application on ephemeral port to avoid port conflicts.
      * We can discover the actual port by calling {@link io.helidon.microprofile.server.Server#port()} method afterwards.
      */
-    private static final Server SERVER = Server.builder().port(0).build().start();
+    public static final Server SERVER = Server.builder().port(0).build().start();
     private OrderRepository orders;
 
     @BeforeEach
