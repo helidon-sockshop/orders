@@ -3,22 +3,20 @@ package io.helidon.examples.sockshop.orders.mongo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
-import java.util.logging.Logger;
 
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
-import javax.interceptor.Interceptor;
 
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.OrderRepository;
 
 import com.mongodb.client.MongoCollection;
-import org.bson.BsonDocument;
 import org.eclipse.microprofile.opentracing.Traced;
 
 import static com.mongodb.client.model.Filters.eq;
+import static javax.interceptor.Interceptor.Priority.APPLICATION;
 
 /**
  * An implementation of {@link io.helidon.examples.sockshop.orders.OrderRepository}
@@ -26,7 +24,7 @@ import static com.mongodb.client.model.Filters.eq;
  */
 @ApplicationScoped
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION)
+@Priority(APPLICATION)
 @Traced
 public class MongoOrderRepository implements OrderRepository {
     protected MongoCollection<Order> orders;

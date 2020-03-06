@@ -20,5 +20,5 @@ package io.helidon.examples.sockshop.orders;
  * do not override any methods.
  */
 public interface TestOrderRepository {
-    public void clear();
+    void clear();
 }

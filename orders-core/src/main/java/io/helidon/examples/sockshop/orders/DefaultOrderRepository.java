@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.interceptor.Interceptor;
 
 import org.eclipse.microprofile.opentracing.Traced;
+
+import static javax.interceptor.Interceptor.Priority.APPLICATION;
 
 /**
  * Simple in-memory implementation of {@link io.helidon.examples.sockshop.orders.OrderRepository}
@@ -20,7 +21,7 @@ import org.eclipse.microprofile.opentracing.Traced;
  * API testing and quick demos.
  */
 @ApplicationScoped
-@Priority(Interceptor.Priority.APPLICATION-10)
+@Priority(APPLICATION - 10)
 @Traced
 public class DefaultOrderRepository implements OrderRepository {
     protected Map<String, Order> orders;

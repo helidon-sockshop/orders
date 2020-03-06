@@ -5,8 +5,6 @@ import java.util.Collection;
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
-import javax.inject.Inject;
-import javax.interceptor.Interceptor;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -17,13 +15,15 @@ import io.helidon.examples.sockshop.orders.OrderRepository;
 
 import org.eclipse.microprofile.opentracing.Traced;
 
+import static javax.interceptor.Interceptor.Priority.APPLICATION;
+
 /**
  * An implementation of {@link io.helidon.examples.sockshop.orders.OrderRepository}
  * that that uses relational database (via JPA) as a backend data store.
  */
 @ApplicationScoped
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION)
+@Priority(APPLICATION)
 @Traced
 public class JpaOrderRepository implements OrderRepository {
 
