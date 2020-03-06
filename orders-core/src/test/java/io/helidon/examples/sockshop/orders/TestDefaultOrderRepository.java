@@ -5,7 +5,7 @@ import javax.enterprise.inject.Alternative;
 import javax.interceptor.Interceptor;
 
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION+10)
+@Priority(Interceptor.Priority.APPLICATION-5)
 public class TestDefaultOrderRepository extends DefaultOrderRepository implements TestOrderRepository {
     public TestDefaultOrderRepository() {}
 

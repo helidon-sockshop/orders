@@ -8,7 +8,7 @@ import javax.transaction.Transactional;
 import io.helidon.examples.sockshop.orders.TestOrderRepository;
 
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION+100)
+@Priority(Interceptor.Priority.APPLICATION+5)
 public class TestJpaOrderRepository extends JpaOrderRepository implements TestOrderRepository {
     @Transactional
     public void clear() {

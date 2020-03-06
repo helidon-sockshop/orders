@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.interceptor.Interceptor;
 
 import io.helidon.examples.sockshop.orders.Order;
-import io.helidon.examples.sockshop.orders.OrderRepository;
+import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 
 import org.eclipse.microprofile.opentracing.Traced;
 import org.redisson.api.RMap;
@@ -21,43 +21,11 @@ import org.redisson.api.RMap;
  */
 @ApplicationScoped
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION+10)
+@Priority(Interceptor.Priority.APPLICATION)
 @Traced
-public class RedisOrderRepository implements OrderRepository {
-    protected RMap<String, Order> carts;
-
+public class RedisOrderRepository extends DefaultOrderRepository {
     @Inject
     public RedisOrderRepository(RMap<String, Order> carts) {
-        this.carts = carts;
-    }
-
-    @Override
-    public Collection<? extends Order> findOrdersByCustomer(String customerId) {
-        return findOrdersByCustomerAsync(customerId).toCompletableFuture().join();
-    }
-
-    @Override
-    public Order get(String orderId) {
-        return getAsync(orderId).toCompletableFuture().join();
-    }
-
-    @Override
-    public void saveOrder(Order order) {
-        saveOrderAsync(order).toCompletableFuture().join();
-    }
-
-    public CompletionStage<Collection<? extends Order>> findOrdersByCustomerAsync(String customerId) {
-        return carts.readAllValuesAsync()
-                    .thenApply(vs -> vs.stream()
-                                     .filter(order -> order.getCustomer().getId().equals(customerId))
-                                     .collect(Collectors.toList()));
-    }
-
-    public CompletionStage<Order> getAsync(String orderId) {
-        return carts.getAsync(orderId);
-    }
-
-    public CompletionStage saveOrderAsync(Order order) {
-        return carts.putAsync(order.getOrderId(), order);
+        super(carts);
     }
 }

@@ -23,7 +23,7 @@ import org.eclipse.microprofile.opentracing.Traced;
  */
 @ApplicationScoped
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION+10)
+@Priority(Interceptor.Priority.APPLICATION)
 @Traced
 public class JpaOrderRepository implements OrderRepository {
 

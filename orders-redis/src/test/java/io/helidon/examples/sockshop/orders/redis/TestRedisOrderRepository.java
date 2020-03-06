@@ -11,7 +11,7 @@ import io.helidon.examples.sockshop.orders.Order;
 import org.redisson.api.RMap;
 
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION+100)
+@Priority(Interceptor.Priority.APPLICATION+5)
 public class TestRedisOrderRepository extends RedisOrderRepository implements TestOrderRepository {
     @Inject
     public TestRedisOrderRepository(RMap<String, Order> carts) {
@@ -20,9 +20,6 @@ public class TestRedisOrderRepository extends RedisOrderRepository implements Te
 
     @Override
     public void clear() {
-        carts.readAllKeySetAsync()
-             .thenCompose(ks -> carts.fastRemoveAsync(ks.toArray(new String[ks.size()])))
-             .toCompletableFuture()
-             .join();
+        orders.clear();
     }
 }

@@ -12,7 +12,7 @@ import com.mongodb.client.MongoCollection;
 import org.bson.BsonDocument;
 
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION+100)
+@Priority(Interceptor.Priority.APPLICATION+5)
 public class TestMongoOrderRepository extends MongoOrderRepository implements TestOrderRepository {
     @Inject
     public TestMongoOrderRepository(MongoCollection<Order> orders) {

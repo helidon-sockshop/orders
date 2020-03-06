@@ -26,7 +26,7 @@ import static com.mongodb.client.model.Filters.eq;
  */
 @ApplicationScoped
 @Alternative
-@Priority(Interceptor.Priority.APPLICATION+10)
+@Priority(Interceptor.Priority.APPLICATION)
 @Traced
 public class MongoOrderRepository implements OrderRepository {
     protected MongoCollection<Order> orders;
