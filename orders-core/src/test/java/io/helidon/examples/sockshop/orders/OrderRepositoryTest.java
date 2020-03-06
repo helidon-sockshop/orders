@@ -15,11 +15,10 @@ public abstract class OrderRepositoryTest {
     private OrderRepository orders = getOrderRepository();
 
     protected abstract OrderRepository getOrderRepository();
-    protected abstract void clearRepository(OrderRepository orders);
 
     @BeforeEach
     void setup() {
-        clearRepository(orders);
+        ((TestOrderRepository)orders).clear();
     }
 
     @Test

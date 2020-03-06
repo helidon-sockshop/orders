@@ -2,15 +2,18 @@ package io.helidon.examples.sockshop.orders.jpa;
 
 import java.util.Collection;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Specializes;
+import javax.enterprise.inject.Alternative;
+import javax.inject.Inject;
+import javax.interceptor.Interceptor;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 
 import io.helidon.examples.sockshop.orders.Order;
-import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
+import io.helidon.examples.sockshop.orders.OrderRepository;
 
 import org.eclipse.microprofile.opentracing.Traced;
 
@@ -19,12 +22,13 @@ import org.eclipse.microprofile.opentracing.Traced;
  * that that uses relational database (via JPA) as a backend data store.
  */
 @ApplicationScoped
-@Specializes
+@Alternative
+@Priority(Interceptor.Priority.APPLICATION)
 @Traced
-public class JpaOrderRepository extends DefaultOrderRepository {
+public class JpaOrderRepository implements OrderRepository {
 
     @PersistenceContext
-    private EntityManager em;
+    protected EntityManager em;
 
     @Override
     @Transactional
@@ -46,12 +50,5 @@ public class JpaOrderRepository extends DefaultOrderRepository {
     @Transactional
     public void saveOrder(Order order) {
         em.persist(order);
-    }
-
-    @Override
-    @Transactional
-    public void clear() {
-        em.createQuery("delete from Item").executeUpdate();
-        em.createQuery("delete from Order").executeUpdate();
     }
 }

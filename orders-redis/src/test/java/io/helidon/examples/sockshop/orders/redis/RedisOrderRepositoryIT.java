@@ -14,11 +14,6 @@ class RedisOrderRepositoryIT extends OrderRepositoryTest {
         String host = System.getProperty("db.host","localhost");
         int    port = Integer.parseInt(System.getProperty("db.port","6379"));
 
-        return new RedisOrderRepository(orders(client(host, port)));
-    }
-
-    @Override
-    protected void clearRepository(OrderRepository orders) {
-        ((RedisOrderRepository) orders).clear();
+        return new TestRedisOrderRepository(orders(client(host, port)));
     }
 }

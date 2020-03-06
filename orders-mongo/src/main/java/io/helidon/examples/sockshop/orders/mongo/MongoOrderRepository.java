@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Specializes;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
+import javax.interceptor.Interceptor;
 
-import io.helidon.examples.sockshop.orders.DefaultOrderRepository;
 import io.helidon.examples.sockshop.orders.Order;
+import io.helidon.examples.sockshop.orders.OrderRepository;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.BsonDocument;
@@ -23,11 +25,11 @@ import static com.mongodb.client.model.Filters.eq;
  * that that uses MongoDB as a backend data store.
  */
 @ApplicationScoped
-@Specializes
+@Alternative
+@Priority(Interceptor.Priority.APPLICATION)
 @Traced
-public class MongoOrderRepository extends DefaultOrderRepository {
-
-    private MongoCollection<Order> orders;
+public class MongoOrderRepository implements OrderRepository {
+    protected MongoCollection<Order> orders;
 
     @Inject
     MongoOrderRepository(MongoCollection<Order> orders) {
@@ -52,12 +54,5 @@ public class MongoOrderRepository extends DefaultOrderRepository {
     @Override
     public void saveOrder(Order order) {
         orders.insertOne(order);
-    }
-
-    // ---- helpers ---------------------------------------------------------
-
-    @Override
-    public void clear() {
-        orders.deleteMany(new BsonDocument());
     }
 }
