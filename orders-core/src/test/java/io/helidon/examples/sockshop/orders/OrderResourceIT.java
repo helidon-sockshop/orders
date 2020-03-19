@@ -102,10 +102,10 @@ public class OrderResourceIT {
     void testCreateOrder() {
         String baseUri = "http://localhost:" + SERVER.port();
         NewOrderRequest req = NewOrderRequest.builder()
-                .customer(baseUri + "/customers/homer")
-                .address(baseUri + "/addresses/homer:1")
-                .card(baseUri + "/cards/homer:1234")
-                .items(baseUri + "/carts/homer/items")
+                .customer(URI.create(baseUri + "/customers/homer"))
+                .address(URI.create(baseUri + "/addresses/homer:1"))
+                .card(URI.create(baseUri + "/cards/homer:1234"))
+                .items(URI.create(baseUri + "/carts/homer/items"))
                 .build();
 
         given().
@@ -142,10 +142,10 @@ public class OrderResourceIT {
     void testPaymentFailure() {
         String baseUri = "http://localhost:" + SERVER.port();
         NewOrderRequest req = NewOrderRequest.builder()
-                .customer(baseUri + "/customers/lisa")
-                .address(baseUri + "/addresses/lisa:1")
-                .card(baseUri + "/cards/lisa:1234")
-                .items(baseUri + "/carts/lisa/items")
+                .customer(URI.create(baseUri + "/customers/lisa"))
+                .address(URI.create(baseUri + "/addresses/lisa:1"))
+                .card(URI.create(baseUri + "/cards/lisa:1234"))
+                .items(URI.create(baseUri + "/carts/lisa/items"))
                 .build();
 
         given().
@@ -163,10 +163,10 @@ public class OrderResourceIT {
     void testPaymentDeclined() {
         String baseUri = "http://localhost:" + SERVER.port();
         NewOrderRequest req = NewOrderRequest.builder()
-                .customer(baseUri + "/customers/bart")
-                .address(baseUri + "/addresses/bart:1")
-                .card(baseUri + "/cards/bart:1234")
-                .items(baseUri + "/carts/bart/items")
+                .customer(URI.create(baseUri + "/customers/bart"))
+                .address(URI.create(baseUri + "/addresses/bart:1"))
+                .card(URI.create(baseUri + "/cards/bart:1234"))
+                .items(URI.create(baseUri + "/carts/bart/items"))
                 .build();
 
         given().

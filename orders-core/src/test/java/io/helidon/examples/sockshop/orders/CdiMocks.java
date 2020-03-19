@@ -16,25 +16,28 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessInjectionPoint;
 import javax.enterprise.inject.spi.WithAnnotations;
 
+import lombok.extern.java.Log;
+
 /**
  * @RegisterRestClient annotation is processed by Jersey to create a Bean that implements
  * the given interface. Adding test instances that mock interaction with the service causes
  * ambiguity. This Extension finds InjectionPoints and modifies the set of Qualifiers, so
- * the one annotated with @TestInstance is selected by CDI.
+ * the one annotated with @Mock is selected by CDI.
  */
-public class CDIMocks implements Extension {
+@Log
+public class CdiMocks implements Extension {
    protected Set annotated = new HashSet();
 
-   public void collectCDIMocks(@Observes
+   public void collectCdiMocks(@Observes
                                @WithAnnotations({Mock.class})
                                ProcessAnnotatedType<?> pat) {
        Class<?> clazz = pat.getAnnotatedType().getJavaClass();
        if (clazz.getInterfaces().length == 0) {
-          System.out.println("FOUND ANNOTATED CLASS, BUT IT DOES NOT IMPLEMENT ANYTHING - WILL NOT MOCK " + clazz);
+          log.warning("CdiMocks: FOUND ANNOTATED CLASS, BUT IT DOES NOT IMPLEMENT ANYTHING - WILL NOT MOCK " + clazz);
        }
 
        for(Class<?> iface: clazz.getInterfaces()) {
-          System.out.println("FOUND MOCK FOR: " + iface);
+          log.info("CdiMocks: FOUND MOCK FOR: " + iface);
           annotated.add(iface);
        }
    }
@@ -46,7 +49,7 @@ public class CDIMocks implements Extension {
            return;
        }
 
-       System.out.println("INJECTING MOCK AT: " + ip);
+       log.info("CdiMocks: INJECTING MOCK AT: " + ip);
        pip.setInjectionPoint(new InjectionPoint() {
            public Annotated getAnnotated() {
                return ip.getAnnotated();

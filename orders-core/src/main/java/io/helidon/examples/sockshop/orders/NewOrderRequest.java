@@ -15,25 +15,25 @@ public class NewOrderRequest {
     /**
      * The URI that should be used to fetch customer information.
      */
-    public String customer;
+    public URI customer;
 
     /**
      * The URI that should be used to fetch billing/shipping address information.
      */
-    public String address;
+    public URI address;
 
     /**
      * The URI that should be used to fetch payment card information.
      */
-    public String card;
+    public URI card;
 
     /**
      * The URI that should be used to fetch order items from the shopping cart.
      */
-    public String items;
+    public URI items;
 
     @Builder
-    NewOrderRequest(String customer, String address, String card, String items) {
+    NewOrderRequest(URI customer, URI address, URI card, URI items) {
         this.customer = customer;
         this.address = address;
         this.card = card;

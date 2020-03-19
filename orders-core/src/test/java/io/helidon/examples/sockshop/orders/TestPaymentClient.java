@@ -10,7 +10,7 @@ public class TestPaymentClient implements PaymentClient {
    public TestPaymentClient() {
    }
 
-   public Payment pay(PaymentRequest request) {
+   public Payment authorize(PaymentRequest request) {
       return payment(request.getCustomer().getId());
    }
 }

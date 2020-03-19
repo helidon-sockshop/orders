@@ -43,18 +43,6 @@ public class OrderResource {
     @Inject
     private OrderRepository orders;
 
-    /**
-     * Inject payment service host[:port] from configuration.
-     */
-    @ConfigProperty(name = "payment.host", defaultValue = "payment")
-    private String paymentHost = "payment";
-
-    /**
-     * Inject shipping service host[:port] from configuration.
-     */
-    @ConfigProperty(name = "shipping.host", defaultValue = "shipping")
-    private String shippingHost = "shipping";
-
     @Inject
     protected ShippingClient shippingService;
 
@@ -103,35 +91,21 @@ public class OrderResource {
             throw new InvalidOrderException("Invalid order request. Order requires customer, address, card and items.");
         }
 
-        String itemsId = request.items;
-        String cardId = request.card;
-        String addressId = request.address;
-        String customerId = request.customer;
-
-        /*
-         * Workaround for the time being - until the respective callers pass the data, not the full URL
-         */
-        int idx = itemsId.indexOf("/carts/");
-        if (idx >= 0 && itemsId.endsWith("/items")) {
-            itemsId = itemsId.substring(idx + 7, itemsId.length() - 6);
-        }
-        idx = cardId.indexOf("/cards/");
-        if (idx >= 0) {
-            cardId = cardId.substring(idx + 7);
-        }
-        idx = addressId.indexOf("/addresses/");
-        if (idx >= 0) {
-            addressId = addressId.substring(idx + 11);
-        }
-        idx = customerId.indexOf("/customers/");
-        if (idx >= 0) {
-            customerId = customerId.substring(idx + 11);
+        String itemsPath = request.items.getPath();
+        String addressPath = request.address.getPath();
+        String cardPath = request.card.getPath();
+        String customerPath = request.customer.getPath();
+        if (!itemsPath.startsWith("/carts/") || !itemsPath.endsWith("/items") ||
+            !addressPath.startsWith("/addresses/") ||
+            !cardPath.startsWith("/cards/") ||
+            !customerPath.startsWith("/customers/")) {
+            throw new InvalidOrderException("Invalid order request. Order requires the URIs to have path /customers/xxx, /addresses/xxx, /cards/xxx and /carts/xxx/items.");
         }
 
-        List<Item> items    = cartsService.cart(itemsId);
-        Address    address  = usersService.address(addressId);
-        Card       card     = usersService.card(cardId);
-        Customer   customer = usersService.customer(customerId);
+        List<Item> items    = cartsService.cart(itemsPath.substring(7, itemsPath.length() - 6));
+        Address    address  = usersService.address(addressPath.substring(11));
+        Card       card     = usersService.card(cardPath.substring(7));
+        Customer   customer = usersService.customer(customerPath.substring(11));
 
         String orderId = UUID.randomUUID().toString().substring(0, 8);
         float  amount  = calculateTotal(items);
@@ -147,7 +121,7 @@ public class OrderResource {
 
         log.info("Processing Payment: " + paymentRequest);
 
-        Payment payment = paymentService.pay(paymentRequest);
+        Payment payment = paymentService.authorize(paymentRequest);
 
         log.info("Payment processed: " + payment);
 

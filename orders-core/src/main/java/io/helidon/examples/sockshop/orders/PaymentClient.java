@@ -14,5 +14,5 @@ public interface PaymentClient {
    @POST
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
-   public Payment pay(PaymentRequest request);
+   public Payment authorize(PaymentRequest request);
 }
