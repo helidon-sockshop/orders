@@ -18,10 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
@@ -41,28 +38,22 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 @Log
 public class OrderResource {
     /**
-     * HTTP client to use when calling other services.
-     */
-    @Inject
-    private Client client;
-
-    /**
      * Order repository to use.
      */
     @Inject
     private OrderRepository orders;
 
-    /**
-     * Inject payment service host[:port] from configuration.
-     */
-    @ConfigProperty(name = "payment.host", defaultValue = "payment")
-    private String paymentHost = "payment";
+    @Inject
+    protected ShippingClient shippingService;
 
-    /**
-     * Inject shipping service host[:port] from configuration.
-     */
-    @ConfigProperty(name = "shipping.host", defaultValue = "shipping")
-    private String shippingHost = "shipping";
+    @Inject
+    protected PaymentClient paymentService;
+
+    @Inject
+    protected CartsClient cartsService;
+
+    @Inject
+    protected UsersClient usersService;
 
     @GET
     @Path("search/customerId")
@@ -100,10 +91,21 @@ public class OrderResource {
             throw new InvalidOrderException("Invalid order request. Order requires customer, address, card and items.");
         }
 
-        List<Item> items    = httpGet(request.items, new GenericType<List<Item>>() { });
-        Address    address  = httpGet(request.address, Address.class);
-        Card       card     = httpGet(request.card, Card.class);
-        Customer   customer = httpGet(request.customer, Customer.class);
+        String itemsPath = request.items.getPath();
+        String addressPath = request.address.getPath();
+        String cardPath = request.card.getPath();
+        String customerPath = request.customer.getPath();
+        if (!itemsPath.startsWith("/carts/") || !itemsPath.endsWith("/items") ||
+            !addressPath.startsWith("/addresses/") ||
+            !cardPath.startsWith("/cards/") ||
+            !customerPath.startsWith("/customers/")) {
+            throw new InvalidOrderException("Invalid order request. Order requires the URIs to have path /customers/xxx, /addresses/xxx, /cards/xxx and /carts/xxx/items.");
+        }
+
+        List<Item> items    = cartsService.cart(itemsPath.substring(7, itemsPath.length() - 6));
+        Address    address  = usersService.address(addressPath.substring(11));
+        Card       card     = usersService.card(cardPath.substring(7));
+        Customer   customer = usersService.customer(customerPath.substring(11));
 
         String orderId = UUID.randomUUID().toString().substring(0, 8);
         float  amount  = calculateTotal(items);
@@ -119,8 +121,7 @@ public class OrderResource {
 
         log.info("Processing Payment: " + paymentRequest);
 
-        URI paymentUri = URI.create(format("http://%s/payments", paymentHost));
-        Payment payment = httpPost(paymentUri, Entity.json(paymentRequest), Payment.class);
+        Payment payment = paymentService.authorize(paymentRequest);
 
         log.info("Payment processed: " + payment);
 
@@ -141,8 +142,7 @@ public class OrderResource {
 
         log.info("Creating Shipment: " + shippingRequest);
 
-        URI shippingUri = URI.create(format("http://%s/shipping", shippingHost));
-        Shipment shipment = httpPost(shippingUri, Entity.json(shippingRequest), Shipment.class);
+        Shipment shipment = shippingService.ship(shippingRequest);
 
         log.info("Created Shipment: " + shipment);
 
@@ -180,57 +180,6 @@ public class OrderResource {
         amount += items.stream().mapToDouble(i -> i.getQuantity() * i.getUnitPrice()).sum();
         amount += shipping;
         return amount;
-    }
-
-    /**
-     * Perform HTTP GET against specified URI.
-     *
-     * @param uri           the URI to GET
-     * @param responseClass the class to convert the response to
-     * @param <T>           the type of the response to return
-     *
-     * @return response from an HTTP GET, converted to {@code responseClass}
-     */
-    private <T> T httpGet(URI uri, Class<T> responseClass){
-        log.info("GET " + uri);
-        return client
-                .target(uri)
-                .request(APPLICATION_JSON)
-                .get(responseClass);
-    }
-
-    /**
-     * Perform HTTP GET against specified URI.
-     *
-     * @param uri           the URI to GET
-     * @param responseClass the generic type to convert the response to
-     * @param <T>           the type of the response to return
-     *
-     * @return response from an HTTP GET, converted to {@code responseClass}
-     */
-    private <T> T httpGet(URI uri, GenericType<T> responseClass){
-        log.info("GET " + uri);
-        return client
-                .target(uri)
-                .request(APPLICATION_JSON)
-                .get(responseClass);
-    }
-
-    /**
-     * Perform HTTP POST against specified URI.
-     *
-     * @param uri           the URI to POST to
-     * @param responseClass the class to convert the response to
-     * @param <T>           the type of the response to return
-     *
-     * @return response from an HTTP POST, converted to {@code responseClass}
-     */
-    private <T> T httpPost(URI uri, Entity<?> entity, Class<T> responseClass) {
-        log.info("POST " + uri);
-        return client
-                .target(uri)
-                .request(APPLICATION_JSON)
-                .post(entity, responseClass);
     }
 
     /**
