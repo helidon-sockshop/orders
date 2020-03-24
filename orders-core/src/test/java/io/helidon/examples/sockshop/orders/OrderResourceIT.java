@@ -3,16 +3,14 @@ package io.helidon.examples.sockshop.orders;
 import java.net.URI;
 import java.time.LocalDate;
 
-import javax.ws.rs.client.Client;
-
 import io.helidon.microprofile.server.Server;
 
 import io.restassured.RestAssured;
-
 import io.restassured.http.ContentType;
 import io.restassured.mapper.ObjectMapperType;
-import org.jboss.weld.proxy.WeldClientProxy;
+
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -32,11 +30,27 @@ import static org.hamcrest.Matchers.*;
  * Integration tests for {@link io.helidon.examples.sockshop.orders.OrderResource}.
  */
 public class OrderResourceIT {
+    protected static Server SERVER;
+
     /**
      * This will start the application on ephemeral port to avoid port conflicts.
      * We can discover the actual port by calling {@link io.helidon.microprofile.server.Server#port()} method afterwards.
      */
-    public static final Server SERVER = Server.builder().port(0).build().start();
+    @BeforeAll
+    static void startServer() {
+        // disable global tracing so we can start server in multiple test suites
+        System.setProperty("tracing.global", "false");
+        SERVER = Server.builder().port(0).build().start();
+    }
+
+    /**
+     * Stop the server, as we cannot have multiple servers started at the same time.
+     */
+    @AfterAll
+    static void stopServer() {
+        SERVER.stop();
+    }
+
     private OrderRepository orders;
 
     @BeforeEach
