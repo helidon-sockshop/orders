@@ -10,7 +10,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 @RegisterRestClient(configKey="users-service")
 public interface UsersClient {
-   @Path("/address/{addressId}")
+   @Path("/addresses/{addressId}")
    @GET
    @Consumes(MediaType.APPLICATION_JSON)
    public Address address(@PathParam("addressId") String addressId);
