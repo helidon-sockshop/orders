@@ -1,24 +1,28 @@
 package io.helidon.examples.sockshop.orders;
 
 /**
- * Tests need to interact with the entity backing OrderRepository
- * to reset to initial state before every test. In order to reduce
- * programming errors, the methods needed for the tests should reside
- * in test project. Since various repositories have
- * implementation-specific ways of clearing the repository, they need
- * to extend actual implementations by implementing TestOrderRepository
- * interface. The test rig then can cast the repository it obtains
- * through CDI to a TestOrderRepository, and can clear the repository
- * between the tests.
+ * Tests may need additional methods in repository implementations
+ * in order to pre-load test data, clear the repository between the
+ * test, etc.
+ *
+ * <p>The methods needed only for the tests should reside in the test
+ * project, to avoid polluting production repository implementation
+ * with methods it a) doesn't need, and b) may be downright dangerous.
  *
  * <p>Note that for the CDI to work it is necessary to mark the test
  * repositories with @Alternative and @Priority exceeding that of the
  * implementation.
  *
  * <p>Note that for the tests to test the actual implementation it is
- * necessary that the test implementations only extend the class, but
- * do not override any methods.
+ * necessary that the test implementations only extend the repository
+ * class and add methods, but do not override any methods from the
+ * repository implementation they are testing.
+ *
+ * @author Oleksandr Otenko  2020.03.06
  */
-public interface TestOrderRepository {
+public interface TestOrderRepository extends OrderRepository {
+    /**
+     * Helper to clear this repository for testing.
+     */
     void clear();
 }

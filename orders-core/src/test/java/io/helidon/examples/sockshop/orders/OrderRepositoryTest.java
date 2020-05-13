@@ -12,13 +12,13 @@ import static org.hamcrest.Matchers.is;
  * {@link io.helidon.examples.sockshop.orders.OrderRepository} implementations.
  */
 public abstract class OrderRepositoryTest {
-    private OrderRepository orders = getOrderRepository();
+    private TestOrderRepository orders = getOrderRepository();
 
-    protected abstract OrderRepository getOrderRepository();
+    protected abstract TestOrderRepository getOrderRepository();
 
     @BeforeEach
     void setup() {
-        ((TestOrderRepository)orders).clear();
+        orders.clear();
     }
 
     @Test

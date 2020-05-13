@@ -51,17 +51,16 @@ public class OrderResourceIT {
         SERVER.stop();
     }
 
-    private OrderRepository orders;
+    private TestOrderRepository orders;
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() {
         // Configure RestAssured to run tests against our application
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = SERVER.port();
 
-        orders = SERVER.cdiContainer().select(OrderRepository.class).get();
-
-        ((TestOrderRepository) orders).clear();
+        orders = SERVER.cdiContainer().select(TestOrderRepository.class).get();
+        orders.clear();
     }
 
     @Test

@@ -1,7 +1,7 @@
 package io.helidon.examples.sockshop.orders.jpa;
 
-import io.helidon.examples.sockshop.orders.OrderRepository;
 import io.helidon.examples.sockshop.orders.OrderRepositoryTest;
+import io.helidon.examples.sockshop.orders.TestOrderRepository;
 import io.helidon.microprofile.server.Server;
 
 import org.junit.jupiter.api.AfterAll;
@@ -33,8 +33,8 @@ public class JpaOrderRepositoryIT extends OrderRepositoryTest {
     }
 
     @Override
-    protected OrderRepository getOrderRepository() {
+    protected TestOrderRepository getOrderRepository() {
         // using CDI, because only this way we can interact with @Transactional annotations
-        return SERVER.cdiContainer().select(OrderRepository.class).get();
+        return SERVER.cdiContainer().select(TestOrderRepository.class).get();
     }
 }
