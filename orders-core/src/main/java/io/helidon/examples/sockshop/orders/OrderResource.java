@@ -36,7 +36,7 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 @ApplicationScoped
 @Path("/orders")
 @Log
-public class OrderResource {
+public class OrderResource implements OrderApi{
     /**
      * Order repository to use.
      */
@@ -55,10 +55,8 @@ public class OrderResource {
     @Inject
     protected UsersClient usersService;
 
-    @GET
-    @Path("search/customerId")
-    @Produces(APPLICATION_JSON)
-    public Response getOrdersForCustomer(@QueryParam("custId") String customerId) {
+    @Override
+    public Response getOrdersForCustomer(String customerId) {
         Collection<? extends Order> customerOrders = orders.findOrdersByCustomer(customerId);
         if (customerOrders.isEmpty()) {
             return Response.status(NOT_FOUND).build();
@@ -71,20 +69,16 @@ public class OrderResource {
         return Response.ok(map).build();
     }
 
-    @GET
-    @Path("{id}")
-    @Produces(APPLICATION_JSON)
-    public Response getOrder(@PathParam("id") String orderId) {
+    @Override
+    public Response getOrder(String orderId) {
         Order order = orders.get(orderId);
         return order == null
                 ? Response.status(NOT_FOUND).build()
                 : Response.ok(order).build();
     }
 
-    @POST
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    public Response newOrder(@Context UriInfo uriInfo, NewOrderRequest request) {
+    @Override
+    public Response newOrder(UriInfo uriInfo, NewOrderRequest request) {
         log.info("Processing new order: " + request);
 
         if (request.address == null || request.customer == null || request.card == null || request.items == null) {

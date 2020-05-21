@@ -10,6 +10,7 @@ import javax.persistence.Embeddable;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 /**
  * Customer information.
@@ -22,21 +23,25 @@ public class Customer implements Serializable {
      * Customer identifier.
      */
     @JsonbProperty("username")
+    @Schema(description = "Customer identifier")
     private String id;
 
     /**
      * First name.
      */
+    @Schema(description = "First name")
     private String firstName;
 
     /**
      * Last name.
      */
+    @Schema(description = "Last name")
     private String lastName;
 
     /**
      * Customer's email.
      */
+    @Schema(description = "Customer's email")
     private String email;
 
     @Builder

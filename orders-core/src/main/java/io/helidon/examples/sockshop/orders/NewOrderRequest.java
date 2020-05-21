@@ -5,6 +5,7 @@ import java.net.URI;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 /**
  * The incoming request for new orders.
@@ -15,21 +16,25 @@ public class NewOrderRequest {
     /**
      * The URI that should be used to fetch customer information.
      */
+    @Schema(description = "The URI that should be used to fetch customer information")
     public URI customer;
 
     /**
      * The URI that should be used to fetch billing/shipping address information.
      */
+    @Schema(description = "The URI that should be used to fetch billing/shipping address information")
     public URI address;
 
     /**
      * The URI that should be used to fetch payment card information.
      */
+    @Schema(description = "The URI that should be used to fetch payment card information")
     public URI card;
 
     /**
      * The URI that should be used to fetch order items from the shopping cart.
      */
+    @Schema(description = "The URI that should be used to fetch order items from the shopping cart")
     public URI items;
 
     @Builder
