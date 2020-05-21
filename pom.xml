@@ -11,6 +11,7 @@
 
     <modules>
         <module>orders-core</module>
+        <module>orders-coherence</module>
         <module>orders-mongo</module>
         <module>orders-mysql</module>
         <module>orders-redis</module>
