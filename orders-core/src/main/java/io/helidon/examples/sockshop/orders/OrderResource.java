@@ -1,6 +1,5 @@
 package io.helidon.examples.sockshop.orders;
 
-import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -11,22 +10,15 @@ import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import lombok.extern.java.Log;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import io.helidon.microprofile.grpc.client.GrpcChannel;
+import io.helidon.microprofile.grpc.client.GrpcServiceProxy;
 
-import static java.lang.String.format;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import lombok.extern.java.Log;
+
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -36,7 +28,7 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 @ApplicationScoped
 @Path("/orders")
 @Log
-public class OrderResource implements OrderApi{
+public class OrderResource implements OrderApi {
     /**
      * Order repository to use.
      */
@@ -47,6 +39,8 @@ public class OrderResource implements OrderApi{
     protected ShippingClient shippingService;
 
     @Inject
+    @GrpcServiceProxy
+    @GrpcChannel(name = "payment")
     protected PaymentClient paymentService;
 
     @Inject

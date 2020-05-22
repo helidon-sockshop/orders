@@ -1,0 +1,6 @@
+grpc:
+  channels:
+    payment:
+      host: payment
+    shipping:
+      host: shipping
