@@ -36,6 +36,8 @@ public class OrderResource implements OrderApi {
     private OrderRepository orders;
 
     @Inject
+    @GrpcServiceProxy
+    @GrpcChannel(name = "shipping")
     protected ShippingClient shippingService;
 
     @Inject
