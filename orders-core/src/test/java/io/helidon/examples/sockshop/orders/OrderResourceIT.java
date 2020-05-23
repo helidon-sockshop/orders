@@ -129,7 +129,7 @@ public class OrderResourceIT {
                 post("/orders").
         then().
                 statusCode(CREATED.getStatusCode()).
-                body("total", is(18.99f),
+                body("total", is(14.0f),
                      "payment.authorised", is(true),
                      "shipment.carrier", is("UPS"),
                      "shipment.deliveryDate", is(LocalDate.now().plusDays(2).toString())

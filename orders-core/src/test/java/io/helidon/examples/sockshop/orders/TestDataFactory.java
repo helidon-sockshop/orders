@@ -7,26 +7,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static io.helidon.examples.sockshop.orders.Order.Status.PAID;
+import static io.helidon.examples.sockshop.orders.Order.Status.PAYMENT_FAILED;
+
 /**
  * Helper methods to create test data.
  */
 public class TestDataFactory {
     public static Order order(String customerId, int itemCount) {
         List<Item> items = items(itemCount);
-        float amount = (float) items.stream().mapToDouble(i -> i.getQuantity() * i.getUnitPrice()).sum();
 
         Order order = Order.builder()
-                .orderId(UUID.randomUUID().toString().substring(0, 8))
-                .date(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .customer(customer(customerId))
                 .address(address())
                 .card(card())
                 .items(items)
-                .payment(payment(customerId))
-                .shipment(shipment(customerId))
-                .total(amount)
                 .build();
-        order.getItems().forEach(item -> item.setOrder(order));
+        Payment payment = payment(customerId);
+        order.setPayment(payment);
+        order.setShipment(shipment(customerId));
+        order.setStatus(payment == null || !payment.isAuthorised() ? PAYMENT_FAILED : PAID);
         return order;
     }
 

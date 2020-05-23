@@ -16,9 +16,9 @@ import static javax.ws.rs.core.Response.Status.NOT_ACCEPTABLE;
 @ApplicationScoped
 @Provider
 public class OrderExceptionMapper
-        implements ExceptionMapper<OrderResource.OrderException> {
+        implements ExceptionMapper<OrderException> {
     @Override
-    public Response toResponse(OrderResource.OrderException exception)
+    public Response toResponse(OrderException exception)
     {
         return Response
                 .status(NOT_ACCEPTABLE)

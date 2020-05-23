@@ -10,8 +10,18 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@RegisterRestClient(configKey="carts-service")
+/**
+ * Client-side interface for Carts REST service.
+ */
+@RegisterRestClient(baseUri = "http://carts/")
 public interface CartsClient {
+   /**
+    * Get cart items.
+    *
+    * @param cartId  cart identifier
+    *
+    * @return cart items from the specified cart
+    */
    @Path("/carts/{cartId}/items")
    @GET
    @Consumes(MediaType.APPLICATION_JSON)

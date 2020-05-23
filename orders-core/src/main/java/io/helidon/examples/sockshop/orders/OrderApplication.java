@@ -17,7 +17,7 @@ import io.helidon.common.CollectionsHelper;
  */
 @ApplicationScoped
 @ApplicationPath("/")
-public class OrderService extends Application {
+public class OrderApplication extends Application {
 
     @Override
     public Set<Class<?>> getClasses() {

@@ -2,7 +2,10 @@ package io.helidon.examples.sockshop.orders;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.UUID;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.persistence.CascadeType;
@@ -15,6 +18,7 @@ import javax.persistence.Table;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
 /**
@@ -71,7 +75,7 @@ public class Order implements Serializable, Comparable<Order> {
      */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Schema(description = "Order items")
-    private Collection<Item> items;
+    private Collection<Item> items = new ArrayList<>();
 
     /**
      * Payment authorization.
@@ -87,25 +91,39 @@ public class Order implements Serializable, Comparable<Order> {
     @Schema(description = "Shipment details")
     private Shipment shipment;
 
+    /**
+     * Order status.
+     */
+    @Schema(description = "Order status")
+    private Status status;
+
     @Builder
-    public Order(String orderId,
-                 Customer customer,
+    public Order(Customer customer,
                  Address address,
                  Card card,
-                 LocalDateTime date,
-                 float total,
-                 Collection<Item> items,
-                 Payment payment,
-                 Shipment shipment) {
-        this.orderId = orderId;
+                 Collection<Item> items) {
+        this.orderId  = UUID.randomUUID().toString().substring(0, 8);
+        this.date     = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         this.customer = customer;
-        this.address = address;
-        this.card = card;
-        this.date = date;
+        this.address  = address;
+        this.card     = card;
+        this.status   = Status.CREATED;
+        this.setItems(items);
+    }
+
+    /**
+     * Set order items.
+     *
+     * @param items order items
+     */
+    public void setItems(Collection<Item> items) {
+        float total = 0.0f;
+        for (Item item : items) {
+            total += item.getQuantity() * item.getUnitPrice();
+            item.setOrder(this);
+        }
         this.total = total;
         this.items = items;
-        this.payment = payment;
-        this.shipment = shipment;
     }
 
     /**
@@ -121,5 +139,35 @@ public class Order implements Serializable, Comparable<Order> {
     @Override
     public int compareTo(Order o) {
         return date.compareTo(o.date) * -1;
+    }
+
+    /**
+     * Order status enumeration.
+     */
+    public enum Status {
+        /**
+         * Order was created.
+         */
+        CREATED,
+
+        /**
+         * Payment was processed successfully.
+         */
+        PAID,
+
+        /**
+         * Order was shipped.
+         */
+        SHIPPED,
+
+        /**
+         * Payment was not authorized.
+         */
+        PAYMENT_FAILED,
+
+        /**
+         * Order shipment failed.
+         */
+        SHIPMENT_FAILED
     }
 }
