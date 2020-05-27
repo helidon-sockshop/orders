@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static io.helidon.examples.sockshop.orders.Order.Status.PAID;
 import static io.helidon.examples.sockshop.orders.Order.Status.PAYMENT_FAILED;
+import static io.helidon.examples.sockshop.orders.Order.Status.SHIPPED;
 
 /**
  * Helper methods to create test data.
@@ -41,8 +42,11 @@ public class TestDataFactory {
                 .build();
         Payment payment = payment(customerId);
         order.setPayment(payment);
-        order.setShipment(shipment(customerId));
         order.setStatus(payment == null || !payment.isAuthorised() ? PAYMENT_FAILED : PAID);
+        if (order.getStatus() == PAID) {
+            order.setShipment(shipment(customerId));
+            order.setStatus(SHIPPED);
+        }
         return order;
     }
 

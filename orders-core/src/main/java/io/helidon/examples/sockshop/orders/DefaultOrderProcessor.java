@@ -16,6 +16,7 @@
 
 package io.helidon.examples.sockshop.orders;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -23,9 +24,12 @@ import io.helidon.microprofile.grpc.client.GrpcChannel;
 import io.helidon.microprofile.grpc.client.GrpcServiceProxy;
 
 import lombok.extern.java.Log;
+import org.eclipse.microprofile.opentracing.Traced;
 
 import static io.helidon.examples.sockshop.orders.Order.Status.PAID;
 import static io.helidon.examples.sockshop.orders.Order.Status.PAYMENT_FAILED;
+import static io.helidon.examples.sockshop.orders.Order.Status.SHIPPED;
+import static javax.interceptor.Interceptor.Priority.APPLICATION;
 
 /**
  * Default implementation of the {@link OrderProcessor} service.
@@ -49,6 +53,8 @@ import static io.helidon.examples.sockshop.orders.Order.Status.PAYMENT_FAILED;
  */
 @Log
 @ApplicationScoped
+@Priority(APPLICATION - 10)
+@Traced
 public class DefaultOrderProcessor implements OrderProcessor {
     /**
      * Order repository to use.
@@ -77,10 +83,20 @@ public class DefaultOrderProcessor implements OrderProcessor {
         processPayment(order);
         shipOrder(order);
 
-        orders.saveOrder(order);
+        saveOrder(order);
     }
 
     // ---- helpers ---------------------------------------------------------
+
+    /**
+     * Save specified order.
+     *
+     * @param order the order to save
+     */
+    protected void saveOrder(Order order) {
+        orders.saveOrder(order);
+        log.info("Order saved: " + order);
+    }
 
     /**
      * Process payment and update order with payment details.
@@ -100,13 +116,15 @@ public class DefaultOrderProcessor implements OrderProcessor {
 
         log.info("Processing Payment: " + paymentRequest);
         Payment payment = paymentService.authorize(paymentRequest);
+        if (payment == null) {
+            payment = Payment.builder()
+                    .authorised(false)
+                    .message("Unable to parse authorization packet")
+                    .build();
+        }
         log.info("Payment processed: " + payment);
 
         order.setPayment(payment);
-        if (payment == null) {
-            order.setStatus(PAYMENT_FAILED);
-            throw new PaymentDeclinedException("Unable to parse authorization packet");
-        }
         if (!payment.isAuthorised()) {
             order.setStatus(PAYMENT_FAILED);
             throw new PaymentDeclinedException(payment.getMessage());
@@ -133,6 +151,7 @@ public class DefaultOrderProcessor implements OrderProcessor {
         log.info("Created Shipment: " + shipment);
 
         order.setShipment(shipment);
+        order.setStatus(SHIPPED);
     }
 
     // ---- helper methods --------------------------------------------------

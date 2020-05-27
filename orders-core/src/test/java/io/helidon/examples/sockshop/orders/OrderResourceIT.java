@@ -67,10 +67,10 @@ public class OrderResourceIT {
         SERVER.stop();
     }
 
-    private TestOrderRepository orders;
+    protected TestOrderRepository orders;
 
     @BeforeEach
-    void setup() {
+    protected void setup() {
         // Configure RestAssured to run tests against our application
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = SERVER.port();
@@ -80,7 +80,7 @@ public class OrderResourceIT {
     }
 
     @Test
-    void testGetMissingOrder() {
+    protected void testGetMissingOrder() {
         when().
                 get("/orders/{orderId}", "XYZ").
         then().
@@ -88,7 +88,7 @@ public class OrderResourceIT {
     }
 
     @Test
-    void testGetOrder() {
+    protected void testGetOrder() {
         Order order = order("homer", 1);
         orders.saveOrder(order);
         Order saved = get("/orders/{orderId}", order.getOrderId()).as(Order.class, ObjectMapperType.JSONB);
@@ -97,7 +97,7 @@ public class OrderResourceIT {
     }
 
     @Test
-    void testFindOrdersByCustomerId() {
+    protected void testFindOrdersByCustomerId() {
         orders.saveOrder(order("homer", 1));
         orders.saveOrder(order("homer", 2));
         orders.saveOrder(order("marge", 5));
@@ -128,7 +128,7 @@ public class OrderResourceIT {
     }
 
     @Test
-    void testCreateOrder() {
+    protected void testCreateOrder() {
         String baseUri = "http://localhost:" + SERVER.port();
         NewOrderRequest req = NewOrderRequest.builder()
                 .customer(URI.create(baseUri + "/customers/homer"))
@@ -153,7 +153,7 @@ public class OrderResourceIT {
     }
 
     @Test
-    void testInvalidOrder() {
+    protected void testInvalidOrder() {
         NewOrderRequest req = NewOrderRequest.builder().build();
 
         given().
@@ -168,7 +168,7 @@ public class OrderResourceIT {
     }
 
     @Test
-    void testPaymentFailure() {
+    protected void testPaymentFailure() {
         String baseUri = "http://localhost:" + SERVER.port();
         NewOrderRequest req = NewOrderRequest.builder()
                 .customer(URI.create(baseUri + "/customers/lisa"))
@@ -189,7 +189,7 @@ public class OrderResourceIT {
     }
 
     @Test
-    void testPaymentDeclined() {
+    protected void testPaymentDeclined() {
         String baseUri = "http://localhost:" + SERVER.port();
         NewOrderRequest req = NewOrderRequest.builder()
                 .customer(URI.create(baseUri + "/customers/bart"))

@@ -32,6 +32,8 @@ import static javax.interceptor.Interceptor.Priority.APPLICATION;
 @Priority(APPLICATION + 5)
 public class TestCoherenceOrderRepository extends CoherenceOrderRepository
         implements TestOrderRepository {
+    private String lastOrderId;
+
     @Inject
     public TestCoherenceOrderRepository(@Cache("orders") NamedCache<String, Order> orders) {
         super(orders);
@@ -39,5 +41,16 @@ public class TestCoherenceOrderRepository extends CoherenceOrderRepository
 
     public void clear() {
         orders.clear();
+    }
+
+    @Override
+    public void saveOrder(Order order) {
+        super.saveOrder(order);
+        lastOrderId = order.getOrderId();
+    }
+
+    @Override
+    public String getLastOrderId() {
+        return lastOrderId;
     }
 }

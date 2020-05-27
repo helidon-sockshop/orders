@@ -41,4 +41,13 @@ public interface TestOrderRepository extends OrderRepository {
      * Helper to clear this repository for testing.
      */
     void clear();
+
+    /**
+     * Return the identifier of the last saved order
+     *
+     * @return the identifier of the last saved order
+     */
+    default String getLastOrderId() {
+        return null;
+    }
 }
