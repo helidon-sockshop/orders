@@ -30,7 +30,7 @@ $ docker run --rm --name orders-db --network sockshop \
       -e MYSQL_DATABASE=orders \
       -e MYSQL_USER=orders \
       -e MYSQL_PASSWORD=pass \
-      mysql:8.0.19
+      mysql:8.0.20
 ``` 
 > **Note:** The `--rm` flag above ensures that the container is removed automatically after it is 
 > stopped. This allows you to re-run the command above without having to remove the `orders-db`
