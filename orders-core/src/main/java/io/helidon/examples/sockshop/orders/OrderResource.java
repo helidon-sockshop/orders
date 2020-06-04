@@ -29,6 +29,8 @@ import javax.ws.rs.core.UriInfo;
 
 import lombok.extern.java.Log;
 
+import org.eclipse.microprofile.metrics.annotation.Timed;
+
 import static javax.ws.rs.core.Response.Status.CREATED;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
@@ -80,6 +82,7 @@ public class OrderResource implements OrderApi {
     }
 
     @Override
+    @Timed
     public Response newOrder(UriInfo uriInfo, NewOrderRequest request) {
         log.info("Processing new order: " + request);
 
