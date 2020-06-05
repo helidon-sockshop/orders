@@ -67,6 +67,7 @@ public class DefaultOrderProcessor implements OrderProcessor {
      */
     @Inject
     @GrpcServiceProxy
+    @GrpcChannel(name = "shipping")
     protected ShippingClient shippingService;
 
     /**
@@ -74,6 +75,7 @@ public class DefaultOrderProcessor implements OrderProcessor {
      */
     @Inject
     @GrpcServiceProxy
+    @GrpcChannel(name = "payment")
     protected PaymentClient paymentService;
 
     // --- OrderProcessor interface -----------------------------------------
