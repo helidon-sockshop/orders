@@ -20,7 +20,6 @@ import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import io.helidon.microprofile.grpc.client.GrpcChannel;
 import io.helidon.microprofile.grpc.client.GrpcServiceProxy;
 
 import lombok.extern.java.Log;
@@ -67,7 +66,6 @@ public class DefaultOrderProcessor implements OrderProcessor {
      */
     @Inject
     @GrpcServiceProxy
-    @GrpcChannel(name = "shipping")
     protected ShippingClient shippingService;
 
     /**
@@ -75,7 +73,6 @@ public class DefaultOrderProcessor implements OrderProcessor {
      */
     @Inject
     @GrpcServiceProxy
-    @GrpcChannel(name = "payment")
     protected PaymentClient paymentService;
 
     // --- OrderProcessor interface -----------------------------------------
