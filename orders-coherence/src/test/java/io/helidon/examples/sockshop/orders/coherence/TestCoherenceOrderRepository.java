@@ -23,8 +23,8 @@ import javax.inject.Inject;
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.TestOrderRepository;
 
-import com.oracle.coherence.cdi.Cache;
-import com.tangosol.net.NamedCache;
+import com.oracle.coherence.cdi.Name;
+import com.tangosol.net.NamedMap;
 
 import static javax.interceptor.Interceptor.Priority.APPLICATION;
 
@@ -35,7 +35,7 @@ public class TestCoherenceOrderRepository extends CoherenceOrderRepository
     private String lastOrderId;
 
     @Inject
-    public TestCoherenceOrderRepository(@Cache("orders") NamedCache<String, Order> orders) {
+    public TestCoherenceOrderRepository(@Name("orders") NamedMap<String, Order> orders) {
         super(orders);
     }
 

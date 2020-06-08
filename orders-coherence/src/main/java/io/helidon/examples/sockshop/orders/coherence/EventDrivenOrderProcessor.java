@@ -27,9 +27,7 @@ import io.helidon.examples.sockshop.orders.DefaultOrderProcessor;
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.OrderProcessor;
 
-import com.oracle.coherence.cdi.events.CacheName;
-import com.oracle.coherence.cdi.events.Inserted;
-import com.oracle.coherence.cdi.events.Updated;
+import com.oracle.coherence.cdi.events.Cache;
 import com.tangosol.net.events.partition.cache.EntryEvent;
 
 import lombok.extern.java.Log;
@@ -56,14 +54,7 @@ public class EventDrivenOrderProcessor extends DefaultOrderProcessor {
     }
 
     @SuppressWarnings("unchecked")
-    void onOrderCreated(@ObservesAsync @Inserted @CacheName("orders") EntryEvent<?, ?> event) {
-        ((EntryEvent<String, Order>) event).getEntrySet().stream()
-                .map(Map.Entry::getValue)
-                .forEach(this::transitionOrder);
-    }
-
-    @SuppressWarnings("unchecked")
-    void onOrderUpdated(@ObservesAsync @Updated @CacheName("orders") EntryEvent<?, ?> event) {
+    void onOrderCreated(@ObservesAsync @Cache("orders") EntryEvent<?, ?> event) {
         ((EntryEvent<String, Order>) event).getEntrySet().stream()
                 .map(Map.Entry::getValue)
                 .forEach(this::transitionOrder);

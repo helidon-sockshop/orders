@@ -27,8 +27,8 @@ import javax.inject.Inject;
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.OrderRepository;
 
-import com.oracle.coherence.cdi.Cache;
-import com.tangosol.net.NamedCache;
+import com.oracle.coherence.cdi.Name;
+import com.tangosol.net.NamedMap;
 import com.tangosol.util.Filters;
 
 import org.eclipse.microprofile.opentracing.Traced;
@@ -44,10 +44,10 @@ import static javax.interceptor.Interceptor.Priority.APPLICATION;
 @Priority(APPLICATION)
 @Traced
 public class CoherenceOrderRepository implements OrderRepository {
-    protected NamedCache<String, Order> orders;
+    protected NamedMap<String, Order> orders;
 
     @Inject
-    public CoherenceOrderRepository(@Cache("orders") NamedCache<String, Order> orders) {
+    public CoherenceOrderRepository(@Name("orders") NamedMap<String, Order> orders) {
         this.orders = orders;
     }
 
