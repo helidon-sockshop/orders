@@ -63,5 +63,4 @@ To learn how to run the service in Kubernetes, as part of a larger Sock Shop app
 please refer to the [main documentation page](../sockshop/README.md).
 
 ## License
-
-Apache License 2.0
+The Universal Permissive License (UPL), Version 1.0
