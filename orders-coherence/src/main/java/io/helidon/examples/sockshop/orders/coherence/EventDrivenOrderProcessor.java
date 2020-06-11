@@ -7,8 +7,6 @@
 
 package io.helidon.examples.sockshop.orders.coherence;
 
-import java.util.Map;
-
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.ObservesAsync;
@@ -18,7 +16,7 @@ import io.helidon.examples.sockshop.orders.DefaultOrderProcessor;
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.OrderProcessor;
 
-import com.oracle.coherence.cdi.events.Cache;
+import com.oracle.coherence.cdi.events.MapName;
 import com.tangosol.net.events.partition.cache.EntryEvent;
 
 import lombok.extern.java.Log;
@@ -45,13 +43,9 @@ public class EventDrivenOrderProcessor extends DefaultOrderProcessor {
     }
 
     @SuppressWarnings("unchecked")
-    void onOrderCreated(@ObservesAsync @Cache("orders") EntryEvent<?, ?> event) {
-        ((EntryEvent<String, Order>) event).getEntrySet().stream()
-                .map(Map.Entry::getValue)
-                .forEach(this::transitionOrder);
-    }
+    void onOrderCreated(@ObservesAsync @MapName("orders") EntryEvent<String, Order> event) {
+        Order order = event.getValue();
 
-    private void transitionOrder(Order order) {
         switch (order.getStatus()) {
         case CREATED:
             try {
