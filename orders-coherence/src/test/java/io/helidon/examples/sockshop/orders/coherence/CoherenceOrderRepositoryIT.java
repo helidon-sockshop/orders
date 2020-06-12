@@ -38,7 +38,6 @@ class CoherenceOrderRepositoryIT extends OrderRepositoryTest {
     @AfterAll
     static void stopServer() {
         SERVER.stop();
-        DefaultCacheServer.shutdown();
     }
 
     @Override
