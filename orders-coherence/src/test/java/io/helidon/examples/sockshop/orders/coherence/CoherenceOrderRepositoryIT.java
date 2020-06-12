@@ -11,7 +11,6 @@ import io.helidon.examples.sockshop.orders.OrderRepositoryTest;
 import io.helidon.examples.sockshop.orders.TestOrderRepository;
 import io.helidon.microprofile.server.Server;
 
-import com.tangosol.net.DefaultCacheServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 

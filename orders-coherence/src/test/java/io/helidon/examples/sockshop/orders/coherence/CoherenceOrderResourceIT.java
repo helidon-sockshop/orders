@@ -16,7 +16,6 @@ import io.helidon.examples.sockshop.orders.OrderResourceIT;
 
 import com.oracle.bedrock.testsupport.deferred.Eventually;
 
-import com.tangosol.net.DefaultCacheServer;
 import io.restassured.http.ContentType;
 
 import org.junit.jupiter.api.AfterAll;
