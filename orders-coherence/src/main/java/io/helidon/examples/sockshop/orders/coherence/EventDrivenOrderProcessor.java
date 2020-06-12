@@ -9,7 +9,6 @@ package io.helidon.examples.sockshop.orders.coherence;
 
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.enterprise.event.ObservesAsync;
 import javax.enterprise.inject.Alternative;
 
