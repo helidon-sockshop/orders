@@ -44,7 +44,6 @@ public class CoherenceOrderResourceIT extends OrderResourceIT {
     @AfterAll
     static void stopServer() {
         SERVER.stop();
-        DefaultCacheServer.shutdown();
     }
 
     // We need to override the following test methods to take into account the

@@ -9,6 +9,7 @@ package io.helidon.examples.sockshop.orders.coherence;
 
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.enterprise.event.ObservesAsync;
 import javax.enterprise.inject.Alternative;
 
@@ -16,7 +17,9 @@ import io.helidon.examples.sockshop.orders.DefaultOrderProcessor;
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.OrderProcessor;
 
+import com.oracle.coherence.cdi.events.Inserted;
 import com.oracle.coherence.cdi.events.MapName;
+import com.oracle.coherence.cdi.events.Updated;
 import com.tangosol.net.events.partition.cache.EntryEvent;
 
 import lombok.extern.java.Log;
@@ -43,7 +46,7 @@ public class EventDrivenOrderProcessor extends DefaultOrderProcessor {
     }
 
     @SuppressWarnings("unchecked")
-    void onOrderCreated(@ObservesAsync @MapName("orders") EntryEvent<String, Order> event) {
+    void onOrderCreated(@ObservesAsync @Inserted @Updated @MapName("orders") EntryEvent<String, Order> event) {
         Order order = event.getValue();
 
         switch (order.getStatus()) {
