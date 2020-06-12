@@ -7,6 +7,8 @@
 
 package io.helidon.examples.sockshop.orders.jpa;
 
+import javax.enterprise.inject.spi.CDI;
+
 import io.helidon.examples.sockshop.orders.OrderRepositoryTest;
 import io.helidon.examples.sockshop.orders.TestOrderRepository;
 import io.helidon.microprofile.server.Server;
@@ -42,6 +44,6 @@ public class JpaOrderRepositoryIT extends OrderRepositoryTest {
     @Override
     protected TestOrderRepository getOrderRepository() {
         // using CDI, because only this way we can interact with @Transactional annotations
-        return SERVER.cdiContainer().select(TestOrderRepository.class).get();
+        return CDI.current().select(TestOrderRepository.class).get();
     }
 }

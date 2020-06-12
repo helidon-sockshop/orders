@@ -11,8 +11,6 @@ import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.helidon.common.CollectionsHelper;
-
 import lombok.Data;
 
 /**
@@ -20,7 +18,7 @@ import lombok.Data;
  * {@link io.helidon.examples.sockshop.orders.Order}.
  */
 public class Links extends LinkedHashMap<String, Links.Link> implements Serializable {
-    private static Map<String, String> ENTITY_MAP = CollectionsHelper.mapOf("order", "orders");
+    private static Map<String, String> ENTITY_MAP = Map.of("order", "orders");
 
     /**
      * Add link to the specified entity.

@@ -7,6 +7,8 @@
 
 package io.helidon.examples.sockshop.orders.coherence;
 
+import javax.enterprise.inject.spi.CDI;
+
 import io.helidon.examples.sockshop.orders.OrderRepositoryTest;
 import io.helidon.examples.sockshop.orders.TestOrderRepository;
 import io.helidon.microprofile.server.Server;
@@ -41,6 +43,6 @@ class CoherenceOrderRepositoryIT extends OrderRepositoryTest {
 
     @Override
     public TestOrderRepository getOrderRepository() {
-        return SERVER.cdiContainer().select(TestOrderRepository.class).get();
+        return CDI.current().select(TestOrderRepository.class).get();
     }
 }

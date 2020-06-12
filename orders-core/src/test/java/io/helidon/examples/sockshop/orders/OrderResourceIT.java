@@ -10,6 +10,8 @@ package io.helidon.examples.sockshop.orders;
 import java.net.URI;
 import java.time.LocalDate;
 
+import javax.enterprise.inject.spi.CDI;
+
 import io.helidon.microprofile.server.Server;
 
 import io.restassured.RestAssured;
@@ -66,7 +68,7 @@ public class OrderResourceIT {
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = SERVER.port();
 
-        orders = SERVER.cdiContainer().select(TestOrderRepository.class).get();
+        orders = CDI.current().select(TestOrderRepository.class).get();
         orders.clear();
     }
 

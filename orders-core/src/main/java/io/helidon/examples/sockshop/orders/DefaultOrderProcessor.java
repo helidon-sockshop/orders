@@ -11,7 +11,7 @@ import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import io.helidon.microprofile.grpc.client.GrpcServiceProxy;
+import io.helidon.microprofile.grpc.client.GrpcProxy;
 
 import lombok.extern.java.Log;
 import org.eclipse.microprofile.opentracing.Traced;
@@ -56,14 +56,14 @@ public class DefaultOrderProcessor implements OrderProcessor {
      * Shipping service client.
      */
     @Inject
-    @GrpcServiceProxy
+    @GrpcProxy
     protected ShippingClient shippingService;
 
     /**
      * Payment service client.
      */
     @Inject
-    @GrpcServiceProxy
+    @GrpcProxy
     protected PaymentClient paymentService;
 
     // --- OrderProcessor interface -----------------------------------------
