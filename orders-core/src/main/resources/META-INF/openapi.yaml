@@ -11,10 +11,10 @@ info:
   version: 1.4.4
   contact:
     name: "Helidon Sock Shop"
-    url: https://github.com/helidon-sock-shop/sockshop
+    url: https://github.com/helidon-sockshop/sockshop
   license:
     name: "The Universal Permissive License (UPL), Version 1.0"
-    url: https://github.com/helidon-sock-shop/sockshop/blob/master/LICENSE.txt
+    url: https://github.com/helidon-sockshop/sockshop/blob/master/LICENSE.txt
 servers:
   - url: http://api.core.sockshop.helidon.io/
     description: "Sock Shop implementation with In-Memory backend"
@@ -28,7 +28,7 @@ servers:
     description: "Sock Shop implementation with MySQL backend"
 externalDocs:
   description: "Additional Documentation"
-  url: https://github.com/helidon-sock-shop/orders
+  url: https://github.com/helidon-sockshop/orders
 
   
     
