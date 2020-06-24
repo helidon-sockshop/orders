@@ -81,7 +81,7 @@
 
   <activeProfiles>
     <activeProfile>default</activeProfile>
-    <activeProfile>ssrh-staging</activeProfile>
+    <activeProfile>ossrh-staging</activeProfile>
   </activeProfiles>
 
 </settings>
