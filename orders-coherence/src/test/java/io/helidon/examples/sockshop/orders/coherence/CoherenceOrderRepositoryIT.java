@@ -7,8 +7,6 @@
 
 package io.helidon.examples.sockshop.orders.coherence;
 
-import com.tangosol.net.Coherence;
-
 import javax.enterprise.inject.spi.CDI;
 
 import io.helidon.examples.sockshop.orders.OrderRepositoryTest;
@@ -41,7 +39,6 @@ class CoherenceOrderRepositoryIT extends OrderRepositoryTest {
     @AfterAll
     static void stopServer() {
         SERVER.stop();
-        Coherence.closeAll();
     }
 
     @Override
