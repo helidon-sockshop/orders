@@ -14,7 +14,7 @@ import javax.inject.Inject;
 import io.helidon.examples.sockshop.orders.Order;
 import io.helidon.examples.sockshop.orders.TestOrderRepository;
 
-import com.oracle.coherence.cdi.Name;
+import com.oracle.coherence.inject.Name;
 import com.tangosol.net.NamedMap;
 
 import static javax.interceptor.Interceptor.Priority.APPLICATION;
