@@ -44,7 +44,6 @@ public class EventDrivenOrderProcessor extends DefaultOrderProcessor {
         saveOrder(order);
     }
 
-    @SuppressWarnings("unchecked")
     void onOrderCreated(@ObservesAsync @Inserted @Updated @MapName("orders") EntryEvent<String, Order> event) {
         Order order = event.getValue();
 
