@@ -32,7 +32,7 @@ $ docker run --rm --name orders-db --network sockshop mongo:4.2.2
 Finally, you can start the service container in the same network:
 
 ```bash
-$ docker run --network sockshop -p 7001:7001 helidon/sockshop/orders-mongo
+$ docker run --network sockshop -p 7001:7001 ghcr.io/helidon-sockshop/orders-mongo
 ``` 
 
 Once the container is up and running, you should be able to access [service API](../README.md#api) 
